@@ -48,20 +48,15 @@ Clear:
 StartOfFrame:
 
 ; Start of vertical blank processing
-   lda #0
+   lda #%01000000
    sta VBLANK
 
    lda #2
    sta VSYNC
-
 ; 3 scanlines of VSYNCH signal...
    sta WSYNC
-
    sta WSYNC
-
    sta WSYNC
-
-
    lda #0
    sta VSYNC
 
@@ -190,6 +185,8 @@ StartOfFrame:
    sta WSYNC
    sta WSYNC
 
+
+
    lda #%01000010
    sta VBLANK                     ; end of screen - enter blanking
 
@@ -200,9 +197,111 @@ StartOfFrame:
    dex
    bne @oscan_loop
 
+   bit INPT4
+   bpl level1
+
    jmp StartOfFrame
 
 ; Pattern Data
+
+level1:
+   lda #0
+   sta VBLANK
+   lda #%01000000
+   sta VBLANK
+   lda #2
+   sta VSYNC
+; 3 scanlines of VSYNCH signal...
+   sta WSYNC
+   sta WSYNC
+   sta WSYNC
+   lda #0
+   sta VSYNC
+; 37 scanlines of vertical blank...
+   ldx #37
+@vblank_loop:
+   sta WSYNC
+   dex
+   bne @vblank_loop
+
+   ; TODO: playfield
+   ldx #150
+:  sta WSYNC
+   dex
+   bne :-
+
+   lda #$1C ; yellow
+   sta COLUP0
+   lda #$0C
+   sta GRP0
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   sta RESP0
+   sta WSYNC
+   lda #$0E
+   sta GRP0
+   sta WSYNC
+   lda #$1C
+   sta GRP0
+   sta WSYNC
+   sta WSYNC
+   lda #$14
+   sta GRP0
+   sta WSYNC
+   lda #$0E ; white
+   sta COLUP0
+   lda #$0C
+   sta GRP0
+   sta WSYNC
+   sta WSYNC
+   sta WSYNC
+   sta WSYNC
+   lda #$96 ; blue
+   sta COLUP0
+   lda #$1E
+   sta GRP0
+   sta WSYNC
+   sta WSYNC
+   sta WSYNC
+   lda #$3F
+   sta GRP0
+   sta WSYNC
+   sta WSYNC
+   sta WSYNC
+   lda #$0E ; white
+   sta COLUP0
+   lda #$08
+   sta GRP0
+   sta WSYNC
+   sta WSYNC
+   lda #$12 ; brown
+   sta COLUP0
+   lda #$0C
+   sta GRP0
+   sta WSYNC
+   lda #0
+   sta GRP0
+
+   ldx #24
+:  sta WSYNC
+   dex
+   bne :-
+
+   lda #%01000010
+   sta VBLANK                     ; end of screen - enter blanking
+
+   ; 30 scanlines of overscan...
+   ldx #30
+@oscan_loop:
+   sta WSYNC
+   dex
+   bne @oscan_loop
+
+   jmp level1
 
 
 .org $1FFA
