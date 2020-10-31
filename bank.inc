@@ -1,0 +1,15 @@
+.ifndef BANK_INC
+BANK_INC = 1
+
+; Bank switches
+BANK0 = $1FF4
+BANK1 = $1FF5
+BANK2 = $1FF6
+BANK3 = $1FF7
+BANK4 = $1FF8
+BANK5 = $1FF9
+BANK6 = $1FFA
+BANK7 = $1FFB
+
+
+.endif

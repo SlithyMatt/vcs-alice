@@ -1,8 +1,7 @@
 .include "atari2600.inc"
+.include "bank.inc"
+.include "ram.inc"
 
-; RAM Variables
-PTR1 = $80
-PTR2 = $82
 
 ; Constants
 
@@ -36,6 +35,11 @@ PTR2 = $82
 .segment "STARTUP"
 
 Reset:
+   jmp @start
+   jmp @start
+   bit BANK1
+
+@start:
    ldx #0
    lda #0
 Clear:
@@ -310,3 +314,17 @@ level1:
 .word Reset          ; NMI
 .word Reset          ; RESET
 .word Reset          ; IRQ
+
+.include "alice_bank1.asm"
+.segment "BANK2"
+.segment "VECTORS2"
+.segment "BANK3"
+.segment "VECTORS3"
+.segment "BANK4"
+.segment "VECTORS4"
+.segment "BANK5"
+.segment "VECTORS5"
+.segment "BANK6"
+.segment "VECTORS6"
+.segment "BANK7"
+.segment "VECTORS7"
