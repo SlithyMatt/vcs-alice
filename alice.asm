@@ -233,6 +233,10 @@ level1:
    sta PTR1
    lda #>side_sprites_0
    sta PTR1+1
+   lda #<rabbit_sprites_0
+   sta PTR2
+   lda #>rabbit_sprites_0
+   sta PTR2+1
    sta WSYNC
    lda #0
    sta VSYNC
@@ -315,12 +319,18 @@ level1:
    sta WSYNC
    sta WSYNC
    sta WSYNC
+
+
    ldy #0
    lda (PTR1),y
    sta COLUP0
+   lda (PTR2),y
+   sta COLUP1
    iny
    lda (PTR1),y
    sta GRP0
+   lda (PTR2),y
+   sta GRP1
    iny
    sta WSYNC
    nop
@@ -329,13 +339,21 @@ level1:
 :  dex
    bne :-
    sta RESP0
+   ldx #6
+:  dex
+   bne :-
+   sta RESP1
    sta WSYNC
 @sprite_loop:
    lda (PTR1),y
    sta COLUP0
+   lda (PTR2),y
+   sta COLUP1
    iny
    lda (PTR1),y
    sta GRP0
+   lda (PTR2),y
+   sta GRP1
    iny
    sta WSYNC
    cpy #46
@@ -373,6 +391,9 @@ level1:
 ; Sprites
 side_sprites_0:
 SIDE_SPRITES
+
+rabbit_sprites_0:
+WHITE_RABBIT_SPRITES
 
 .org $1FFA
 .segment "VECTORS"

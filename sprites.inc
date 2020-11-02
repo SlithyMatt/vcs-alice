@@ -76,4 +76,57 @@ SPRITES_INC = 1
 .byte 0,0
 .endmacro
 
+.macro WHITE_RABBIT_SPRITES
+; On ground
+.byte 0,0
+.byte 0,0
+.byte 0,0
+.byte 0,0
+.byte 0,0
+.byte 0,0
+.byte 0,0
+.byte $0E,$08
+.byte $0E,$08
+.byte $0E,$08
+.byte $0E,$08
+.byte $0E,$0C
+.byte $0E,$0C
+.byte $0E,$0C
+.byte $0E,$0C
+.byte $36,$0C
+.byte $36,$0E
+.byte $2A,$1D
+.byte $2A,$1D
+.byte $0E,$3C
+.byte $0E,$1C
+.byte $0E,$1C
+.byte $0E,$0E
+.byte $0E,$07
+; In Air
+.byte 0,0
+.byte 0,0
+.byte 0,0
+.byte $0E,$08
+.byte $0E,$08
+.byte $0E,$08
+.byte $0E,$08
+.byte $0E,$0C
+.byte $0E,$0C
+.byte $0E,$0C
+.byte $0E,$0C
+.byte $36,$0C
+.byte $36,$0E
+.byte $2A,$1D
+.byte $2A,$1D
+.byte $0E,$3C
+.byte $0E,$1C
+.byte $0E,$18
+.byte $0E,$30
+.byte $0E,$20
+.byte 0,0
+.byte 0,0
+.byte 0,0
+.byte 0,0
+.endmacro
+
 .endif
