@@ -1,20 +1,23 @@
 .include "atari2600.inc"
 .include "bank.inc"
 .include "ram.inc"
-
+.include "sprites.inc"
 
 ; Constants
 
 
 ; Macros
 .macro PFLINE n, l0, l1, l2, r0, r1, r2
+.if n > 1
    ldx #n
+.endif
 :  lda #l0
    sta PF0
    lda #l1
    sta PF1
    lda #l2
    sta PF2
+.ifnblank r0
    ldy #3
 :  dey
    bne :-
@@ -25,10 +28,19 @@
    lda #r2
    sta PF2
    sta WSYNC
+.if n > 1
    nop
    nop
    dex
    bne :--
+.endif
+.else
+:  sta WSYNC
+.if n > 1
+   dex
+   bne :-
+.endif
+.endif
 .endmacro
 
 .org $1000
@@ -206,8 +218,7 @@ StartOfFrame:
 
    jmp StartOfFrame
 
-; Pattern Data
-
+; Level 1: Above ground, chasing white rabbit
 level1:
    lda #0
    sta VBLANK
@@ -218,6 +229,10 @@ level1:
 ; 3 scanlines of VSYNCH signal...
    sta WSYNC
    sta WSYNC
+   lda #<side_sprites_0
+   sta PTR1
+   lda #>side_sprites_0
+   sta PTR1+1
    sta WSYNC
    lda #0
    sta VSYNC
@@ -228,69 +243,106 @@ level1:
    dex
    bne @vblank_loop
 
-   ; TODO: playfield
-   ldx #150
+   ; playfield
+   lda #$9C
+   sta COLUBK
+   sta WSYNC
+   sta WSYNC
+   sta WSYNC
+   lda #$C4 ; dark green
+   sta COLUPF
+   PFLINE 1,0,$02,$01
+   PFLINE 1,0,$01,$00
+   PFLINE 1,0,$07,$05
+   PFLINE 1,0,$02,$07
+   PFLINE 1,0,$0D,$0B
+   PFLINE 1,0,$0B,$0D
+   PFLINE 1,0,$15,$16
+   PFLINE 1,0,$1F,$1F
+   PFLINE 1,0,$0F,$0B
+   PFLINE 1,0,$1F,$1F
+   PFLINE 1,0,$17,$1F
+   PFLINE 1,0,$3F,$37
+   PFLINE 1,0,$2F,$2F
+   PFLINE 1,0,$3F,$3F
+   PFLINE 1,0,$1F,$1F
+   PFLINE 2,0,$3F,$3F
+   PFLINE 1,0,$5F,$7F
+   PFLINE 1,0,$3F,$5F
+   PFLINE 1,0,$7F,$7F
+   PFLINE 1,0,$3F,$3F
+   PFLINE 1,0,$7F,$7F
+   PFLINE 1,0,$5F,$3F
+   PFLINE 1,0,$7F,$5F
+   PFLINE 1,0,$7F,$3F
+   PFLINE 1,0,$3F,$7F
+   PFLINE 1,0,$7F,$7F
+   PFLINE 1,0,$BF,$3F
+   PFLINE 1,0,$5F,$7F
+   PFLINE 1,0,$FF,$BF
+   PFLINE 1,0,$BF,$5F
+   PFLINE 1,0,$7F,$FF
+   PFLINE 1,0,$BF,$5F
+   PFLINE 1,0,$7F,$BF
+   PFLINE 1,0,$5F,$FF
+   PFLINE 1,0,$FF,$3F
+   PFLINE 1,0,$5F,$DF
+   PFLINE 1,0,$BF,$7F
+   PFLINE 1,0,$7F,$3F
+   PFLINE 1,0,$5F,$FF
+   PFLINE 1,0,$BF,$5F
+   PFLINE 1,0,$57,$AB
+   lda #$14 ; medium brown
+   sta COLUPF
+   PFLINE 27,0,$03,$01
+   lda #$C8 ; light green
+   sta COLUBK
+   PFLINE 36,0,$03,$01
+   PFLINE 3,0,$07,$03
+   PFLINE 1,0,$0F,$07
+   PFLINE 1,0,$0C,$06
+   PFLINE 1,0,$18,$0C
+   PFLINE 1,0,$10,$08
+   lda #0
+   sta PF1
+   sta PF2
+   ldx #28
 :  sta WSYNC
    dex
    bne :-
-
-   lda #$1C ; yellow
+   lda #$18 ; light brown
+   sta COLUBK
+   ldy #0
+   lda (PTR1),y
    sta COLUP0
-   lda #$0C
+   iny
+   lda (PTR1),y
    sta GRP0
+   iny
+   sta WSYNC
    nop
    nop
-   nop
-   nop
-   nop
-   nop
+   ldx #3
+:  dex
+   bne :-
    sta RESP0
    sta WSYNC
-   lda #$0E
-   sta GRP0
-   sta WSYNC
-   lda #$1C
-   sta GRP0
-   sta WSYNC
-   sta WSYNC
-   lda #$14
-   sta GRP0
-   sta WSYNC
-   lda #$0E ; white
+@sprite_loop:
+   lda (PTR1),y
    sta COLUP0
-   lda #$0C
+   iny
+   lda (PTR1),y
    sta GRP0
+   iny
    sta WSYNC
-   sta WSYNC
-   sta WSYNC
-   sta WSYNC
-   lda #$96 ; blue
-   sta COLUP0
-   lda #$1E
-   sta GRP0
-   sta WSYNC
-   sta WSYNC
-   sta WSYNC
-   lda #$3F
-   sta GRP0
-   sta WSYNC
-   sta WSYNC
-   sta WSYNC
-   lda #$0E ; white
-   sta COLUP0
-   lda #$08
-   sta GRP0
-   sta WSYNC
-   sta WSYNC
-   lda #$12 ; brown
-   sta COLUP0
-   lda #$0C
-   sta GRP0
-   sta WSYNC
+   cpy #46
+   bne @sprite_loop
+
    lda #0
    sta GRP0
-
-   ldx #24
+   lda #$C8 ; light green
+   sta COLUBK
+   ldx #23
 :  sta WSYNC
    dex
    bne :-
@@ -307,6 +359,10 @@ level1:
 
    jmp level1
 
+
+; Sprites
+side_sprites_0:
+SIDE_SPRITES
 
 .org $1FFA
 .segment "VECTORS"
