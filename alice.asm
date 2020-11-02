@@ -312,6 +312,9 @@ level1:
    bne :-
    lda #$18 ; light brown
    sta COLUBK
+   sta WSYNC
+   sta WSYNC
+   sta WSYNC
    ldy #0
    lda (PTR1),y
    sta COLUP0
@@ -340,15 +343,22 @@ level1:
 
    lda #0
    sta GRP0
+   sta WSYNC
+   sta WSYNC
+   sta WSYNC
+   sta WSYNC
    lda #$C8 ; light green
    sta COLUBK
-   ldx #23
+   ldx #17
 :  sta WSYNC
    dex
    bne :-
 
    lda #%01000010
    sta VBLANK                     ; end of screen - enter blanking
+
+   lda #0
+   sta COLUBK
 
    ; 30 scanlines of overscan...
    ldx #30
