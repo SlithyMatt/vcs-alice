@@ -8,10 +8,12 @@
 
 ; Macros
 .macro PFLINE n, l0, l1, l2, r0, r1, r2
+.scope
 .if n > 1
    ldx #n
 .endif
-:  lda #l0
+gfx_loop:
+   lda #l0
    sta PF0
    lda #l1
    sta PF1
@@ -19,8 +21,9 @@
    sta PF2
 .ifnblank r0
    ldy #3
-:  dey
-   bne :-
+delay:
+   dey
+   bne delay
    lda #r0
    sta PF0
    lda #r1
@@ -32,15 +35,17 @@
    nop
    nop
    dex
-   bne :--
+   bne gfx_loop
 .endif
 .else
-:  sta WSYNC
+eol:
+   sta WSYNC
 .if n > 1
    dex
-   bne :-
+   bne eol
 .endif
 .endif
+.endscope
 .endmacro
 
 .org $1000
@@ -339,7 +344,7 @@ level1:
 :  dex
    bne :-
    sta RESP0
-   ldx #6
+   ldx #5
 :  dex
    bne :-
    sta RESP1
@@ -361,6 +366,7 @@ level1:
 
    lda #0
    sta GRP0
+   sta GRP1
    sta WSYNC
    sta WSYNC
    sta WSYNC
