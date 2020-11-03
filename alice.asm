@@ -227,22 +227,82 @@ StartOfFrame:
 level1:
    lda #0
    sta VBLANK
-   lda #%01000000
-   sta VBLANK
+   sta OFFSET
    lda #2
    sta VSYNC
 ; 3 scanlines of VSYNCH signal...
+   inc FRAME_CTR
    sta WSYNC
+   lda JUMP_CD
+   beq @check_jump
+   dec JUMP_CD
+@jump:
+   lda #92
+   sta OFFSET
+   jmp @alice_frame_set
+@check_jump:
+   bit INPT4
+   bmi @release
+   lda RELEASED
+   beq @walk
+   lda #10
+   sta JUMP_CD
+   lda #0
+   sta RELEASED
+   jmp @jump
+@release:
+   lda #1
+   sta RELEASED
+@walk:
+   bit SWCHA
+   bmi @alice_frame_set
+   lda #$10
+   bit FRAME_CTR
+   beq @alice_frame_set
+   lda #46
+   sta OFFSET
+@alice_frame_set:
    sta WSYNC
+   clc
    lda #<side_sprites_0
+   adc OFFSET
    sta PTR1
    lda #>side_sprites_0
+   adc #0
    sta PTR1+1
+   lda #0
+   sta OFFSET
+   lda COUNTER
+   cmp #100
+   bmi @pause_rabbit
+   cmp #140
+   bpl @stop_rabbit
+   lda #$10
+   bit FRAME_CTR
+   beq @rabbit_frame_set
+   lda #46
+   sta OFFSET   
+   inc COUNTER
+   lda #$F0
+   sta HMP1
+   jmp @rabbit_frame_set
+@pause_rabbit:
+   inc COUNTER
+   jmp @rabbit_frame_set
+@stop_rabbit:
+   lda #0
+   sta HMP1
+   lda #92
+   sta OFFSET
+@rabbit_frame_set:
+   sta WSYNC
+   clc
    lda #<rabbit_sprites_0
+   adc OFFSET
    sta PTR2
    lda #>rabbit_sprites_0
+   adc #0
    sta PTR2+1
-   sta WSYNC
    lda #0
    sta VSYNC
 ; 37 scanlines of vertical blank...
@@ -338,16 +398,20 @@ level1:
    sta GRP1
    iny
    sta WSYNC
-   nop
-   nop
-   ldx #3
+   sta HMOVE
+   lda START
+   bne @move
+   ldx #2
 :  dex
    bne :-
    sta RESP0
-   ldx #5
+   ldx #4
 :  dex
    bne :-
    sta RESP1
+   lda #1
+   sta START
+@move:
    sta WSYNC
 @sprite_loop:
    lda (PTR1),y
@@ -378,7 +442,7 @@ level1:
    dex
    bne :-
 
-   lda #%01000010
+   lda #%00000010
    sta VBLANK                     ; end of screen - enter blanking
 
    lda #0

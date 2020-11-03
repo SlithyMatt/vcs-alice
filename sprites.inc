@@ -38,8 +38,8 @@ SPRITES_INC = 1
 .byte $1C, $1C
 .byte $1C, $14
 .byte $0E, $0C
-.byte $0E, $1E
-.byte $0E, $2D
+.byte $0E, $0C
+.byte $0E, $0C
 .byte $0E, $0C
 .byte $96, $1E
 .byte $96, $1E
@@ -84,7 +84,6 @@ SPRITES_INC = 1
 .byte 0,0
 .byte 0,0
 .byte 0,0
-.byte 0,0
 .byte $0E,$08
 .byte $0E,$08
 .byte $0E,$08
@@ -103,7 +102,6 @@ SPRITES_INC = 1
 .byte $0E,$0E
 .byte $0E,$07
 ; In Air
-.byte 0,0
 .byte 0,0
 .byte 0,0
 .byte $0E,$08
@@ -127,6 +125,10 @@ SPRITES_INC = 1
 .byte 0,0
 .byte 0,0
 .byte 0,0
+; Gone
+.repeat 23
+.byte 0,0
+.endrepeat
 .endmacro
 
 .endif
