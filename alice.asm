@@ -65,6 +65,14 @@ Clear:
    bne Clear
 
    ; Initialize graphics
+   lda #<side_sprites_0
+   sta PTR1
+   lda #>side_sprites_0
+   sta PTR1+1
+   lda #<rabbit_sprites_0
+   sta PTR2
+   lda #>rabbit_sprites_0
+   sta PTR2+1
 
 StartOfFrame:
 
@@ -228,6 +236,8 @@ level1:
    lda #0
    sta VBLANK
    sta OFFSET
+   sta HMP0
+   sta HMP1
    lda #2
    sta VSYNC
 ; 3 scanlines of VSYNCH signal...
@@ -256,7 +266,7 @@ level1:
 @walk:
    bit SWCHA
    bmi @alice_frame_set
-   lda #$10
+   lda #$08
    bit FRAME_CTR
    beq @alice_frame_set
    lda #46
@@ -275,27 +285,31 @@ level1:
    lda COUNTER
    cmp #100
    bmi @pause_rabbit
-   cmp #140
+   cmp #157
    bpl @stop_rabbit
-   lda #$10
+   lda #$07
    bit FRAME_CTR
-   beq @rabbit_frame_set
-   lda #46
-   sta OFFSET   
+   bne @rabbit_frame_set
    inc COUNTER
-   lda #$F0
+   lda #$08
+   bit FRAME_CTR
+   bne @rabbit_frame_set
+   lda #46
+   sta OFFSET
+   lda #$D0
    sta HMP1
    jmp @rabbit_frame_set
 @pause_rabbit:
    inc COUNTER
    jmp @rabbit_frame_set
 @stop_rabbit:
-   lda #0
-   sta HMP1
    lda #92
    sta OFFSET
 @rabbit_frame_set:
    sta WSYNC
+   lda #$07
+   bit FRAME_CTR
+   bne @do_vsync
    clc
    lda #<rabbit_sprites_0
    adc OFFSET
@@ -303,10 +317,22 @@ level1:
    lda #>rabbit_sprites_0
    adc #0
    sta PTR2+1
+@do_vsync:
    lda #0
    sta VSYNC
 ; 37 scanlines of vertical blank...
-   ldx #37
+   sta WSYNC
+   bit SWCHA
+   bmi :+
+   lda #$07
+   bit FRAME_CTR
+   bne :+
+   lda #$F0
+   sta HMP0
+:  sta WSYNC
+   sta WSYNC
+   sta HMOVE
+   ldx #34
 @vblank_loop:
    sta WSYNC
    dex
@@ -398,7 +424,6 @@ level1:
    sta GRP1
    iny
    sta WSYNC
-   sta HMOVE
    lda START
    bne @move
    ldx #2
