@@ -76,6 +76,43 @@ SPRITES_INC = 1
 .byte 0,0
 .endmacro
 
+.macro FALLING_SPRITES
+; arms up
+.byte $1C,$2D
+.byte $1C,$1E
+.byte $3E,$0C
+.byte $3E,$0C
+.byte $0E,$2D
+.byte $0E,$1E
+.byte $0E,$0C
+.byte $0E,$0C
+.byte $96,$1E
+.byte $96,$1E
+.byte $96,$1E
+.byte $96,$3F
+.byte $96,$3F
+.byte $96,$3F
+.byte $0E,$18
+.byte $12,$12
+; arms down
+.byte $1C,$2D
+.byte $1C,$1E
+.byte $3E,$0C
+.byte $3E,$0C
+.byte $0E,$0C
+.byte $0E,$1E
+.byte $0E,$2D
+.byte $0E,$0C
+.byte $96,$1E
+.byte $96,$1E
+.byte $96,$1E
+.byte $96,$3F
+.byte $96,$3F
+.byte $96,$3F
+.byte $0E,$18
+.byte $12,$12
+.endmacro
+
 .macro WHITE_RABBIT_SPRITES
 ; On ground
 .byte 0,0
@@ -127,7 +164,7 @@ SPRITES_INC = 1
 .byte 0,0
 ; Gone
 .repeat 23
-.byte 0,0
+.byte $18,$01
 .endrepeat
 .endmacro
 

@@ -2,61 +2,21 @@
 .include "bank.inc"
 .include "ram.inc"
 .include "sprites.inc"
+.include "playfield.inc"
 
 ; Constants
 
-
-; Macros
-.macro PFLINE n, l0, l1, l2, r0, r1, r2
-.scope
-.if n > 1
-   ldx #n
-.endif
-gfx_loop:
-   lda #l0
-   sta PF0
-   lda #l1
-   sta PF1
-   lda #l2
-   sta PF2
-.ifnblank r0
-   ldy #3
-delay:
-   dey
-   bne delay
-   lda #r0
-   sta PF0
-   lda #r1
-   sta PF1
-   lda #r2
-   sta PF2
-   sta WSYNC
-.if n > 1
-   nop
-   nop
-   dex
-   bne gfx_loop
-.endif
-.else
-eol:
-   sta WSYNC
-.if n > 1
-   dex
-   bne eol
-.endif
-.endif
-.endscope
-.endmacro
 
 .org $1000
 .segment "STARTUP"
 
 Reset:
-   jmp @start
-   jmp @start
+   jmp start
+   jmp start
+jump_b0b1:
    bit BANK1
 
-@start:
+start:
    ldx #0
    lda #0
 Clear:
@@ -300,6 +260,7 @@ level1:
    sta HMP1
    jmp @rabbit_frame_set
 @pause_rabbit:
+   sta CXCLR
    inc COUNTER
    jmp @rabbit_frame_set
 @stop_rabbit:
@@ -323,16 +284,18 @@ level1:
 ; 37 scanlines of vertical blank...
    sta WSYNC
    bit SWCHA
-   bmi :+
+   bmi @alice_movement_set
    lda #$07
    bit FRAME_CTR
-   bne :+
+   bne @alice_movement_set
    lda #$F0
    sta HMP0
-:  sta WSYNC
+@alice_movement_set:
+   sta WSYNC
    sta WSYNC
    sta HMOVE
-   ldx #34
+   sta WSYNC
+   ldx #33
 @vblank_loop:
    sta WSYNC
    dex
@@ -479,6 +442,11 @@ level1:
    sta WSYNC
    dex
    bne @oscan_loop
+
+   bit CXPPMM
+   bpl @continue_level1
+   jmp jump_b0b1
+@continue_level1:
 
    jmp level1
 
