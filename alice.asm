@@ -389,11 +389,11 @@ level1:
    sta WSYNC
    lda START
    bne @move
-   ldx #2
+   ldx #5
 :  dex
    bne :-
    sta RESP0
-   ldx #4
+   ldx #1
 :  dex
    bne :-
    sta RESP1

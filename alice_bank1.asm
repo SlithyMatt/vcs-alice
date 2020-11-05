@@ -48,6 +48,14 @@ level2:
    sta VSYNC
 ; 3 scanlines of VSYNCH signal...
    sta WSYNC
+   lda START
+   bne @started
+   ldx #6
+   stx START
+:  dex
+   bne :-
+   sta RESP0
+@started:
    sta WSYNC
    sta WSYNC
    lda #0
@@ -55,16 +63,216 @@ level2:
 
 ; 37 scanlines of vertical blank...
 
-   ldx #37
+   ldx #36
 @vblank_loop:
    sta WSYNC
    dex
    bne @vblank_loop
 
+   lda #0
+   sta PF2_R
+   ldx COUNTER
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
+   sta PF1_R
+   rol PF2_R
+
+
 ; 192 scanlines of picture...
 
-   PFLINE 192,$F0,$FF,$00,$00,$0F,$FF
+   ; First 8 lines: just playfield
+   ldy #8
+@top8:
+   sta WSYNC
+   lda PF1_R
+   sta PF1
+   lda PF2_R
+   sta PF2
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   dey
+   bne @top8
+   inx
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
+   sta PF1_R
+   sta PF1
+   rol PF2_R
+   lda PF2_R
+   sta PF2
+   lda (PTR1),y
+   sta COLUP0
+   iny
+   lda (PTR1),y
+   sta GRP0
+   iny
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
 
+   ; Lines 8-23: playfield + sprite
+@start_alice:
+   sta WSYNC
+@start_alice_skip_wsync:
+   lda PF1_R
+   sta PF1
+   lda PF2_R
+   sta PF2
+   lda (PTR1),y
+   sta COLUP0
+   iny
+   lda (PTR1),y
+   sta GRP0
+   iny
+   lda PF1_R
+   eor #$ff
+   nop
+   nop
+   nop
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   cpy #16
+   bmi @start_alice
+   bne @check_end
+   inx
+   lda #0
+   sta PF2_R
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
+   sta PF1_R
+   sta PF1
+   rol PF2_R
+   lda PF2_R
+   sta PF2
+   iny
+   lda (PTR1),y
+   sta GRP0
+   lda #$96
+   sta COLUP0
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   iny
+   jmp @start_alice
+@check_end:
+   cpy #32
+   bne @start_alice
+   inx
+   lda #0
+   sta PF2_R
+   sta GRP0
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
+   sta PF1_R
+   sta PF1
+   rol PF2_R
+   lda PF2_R
+   sta PF2
+   nop
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   sta WSYNC
+
+   ldy #7
+   jmp @below_row_skip_wsync
+@below_row_loop:
+   sta WSYNC
+@below_row_skip_wsync:
+   lda PF1_R
+   sta PF1
+   lda PF2_R
+   sta PF2
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   dey
+   cpy #0
+   bne @below_row_loop
+   inx
+   cpx #24
+   beq @end_screen
+   lda #0
+   sta PF2_R
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
+   sta PF1_R
+   sta PF1
+   rol PF2_R
+   lda PF2_R
+   sta PF2
+   nop
+   nop
+   nop
+   nop
+   nop
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   ldy #8
+   jmp @below_row_loop
+
+@end_screen:
+   sta WSYNC
    lda #%00000010
    sta VBLANK                     ; end of screen - enter blanking
 
@@ -78,6 +286,83 @@ level2:
    jmp level2
 
 ; Graphics Data
+
+level1_terrain:
+.byte $F0
+.byte $F0
+.byte $F0
+.byte $E0
+.byte $C0
+.byte $C0
+.byte $E0
+.byte $E0
+.byte $F0
+.byte $F8
+.byte $F8
+.byte $FC
+.byte $FE
+.byte $FE
+.byte $FE
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $F8
+.byte $F8
+.byte $F8
+.byte $F0
+.byte $E0
+.byte $C0
+.byte $80
+.byte $00
+.byte $00
+.byte $00
+.byte $00
+.byte $80
+.byte $80
+.byte $C0
+.byte $E0
+.byte $F0
+.byte $F8
+.byte $FC
+.byte $FE
+.byte $FF
+.byte $F0
+.byte $C0
+.byte $00
+.byte $00
+.byte $00
+.byte $00
+.byte $00
+.byte $00
+.byte $00
+.byte $80
+.byte $80
+.byte $E0
+.byte $F8
+.byte $FE
+.byte $FE
+.byte $FF
+.byte $FF
+.byte $FF
+.byte $FE
+.byte $FE
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $F8
+.byte $F8
+.byte $F8
+.byte $F0
+.byte $F0
+.byte $F0
+.byte $F0
+.byte $F0
+.byte $F0
+.byte $F0
+.byte $F0
+.byte $F0
+.byte $F8
+
 
 falling_sprites_1:
 FALLING_SPRITES

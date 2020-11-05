@@ -92,7 +92,7 @@ SPRITES_INC = 1
 .byte $96,$3F
 .byte $96,$3F
 .byte $96,$3F
-.byte $0E,$18
+.byte $0E,$0C
 .byte $12,$12
 ; arms down
 .byte $1C,$2D
@@ -109,7 +109,7 @@ SPRITES_INC = 1
 .byte $96,$3F
 .byte $96,$3F
 .byte $96,$3F
-.byte $0E,$18
+.byte $0E,$0C
 .byte $12,$12
 .endmacro
 

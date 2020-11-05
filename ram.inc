@@ -10,5 +10,8 @@ JUMP_CD     = $86
 RELEASED    = $87
 START       = $88
 COUNTER     = $89
+PF0_R       = $8A
+PF1_R       = $8B
+PF2_R       = $8C
 
 .endif
