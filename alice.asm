@@ -3,6 +3,7 @@
 .include "ram.inc"
 .include "sprites.inc"
 .include "playfield.inc"
+.include "score.inc"
 
 ; Constants
 
@@ -78,7 +79,6 @@ StartOfFrame:
    PFLINE 2,$40,$A9,$8A,$B0,$51,$52
    PFLINE 2,$60,$A9,$0A,$90,$51,$76
    PFLINE 2,$20,$A9,$0A,$90,$51,$26
-   PFLINE 2,$00,$00,$08,$00,$00,$00
    PFLINE 4,$00,$00,$0C,$00,$00,$00
    sta WSYNC
    sta WSYNC
@@ -100,7 +100,7 @@ StartOfFrame:
    sta PF0
    sta PF1
    sta PF2
-   ldx #6
+   ldx #8
 :  sta WSYNC
    dex
    bne :-
@@ -137,8 +137,7 @@ StartOfFrame:
    sta WSYNC
    ; "IN"
    PFLINE 2,$00,$00,$70,$90,$00,$00
-   PFLINE 2,$00,$00,$20,$B0,$00,$00
-   PFLINE 2,$00,$00,$20,$F0,$00,$00
+   PFLINE 4,$00,$00,$20,$B0,$00,$00
    PFLINE 2,$00,$00,$20,$D0,$00,$00
    PFLINE 2,$00,$00,$70,$90,$00,$00
    lda #0
@@ -364,7 +363,7 @@ level1:
    lda #0
    sta PF1
    sta PF2
-   ldx #28
+   ldx #9
 :  sta WSYNC
    dex
    bne :-
@@ -425,10 +424,12 @@ level1:
    sta WSYNC
    lda #$C8 ; light green
    sta COLUBK
-   ldx #17
+   ldx #4
 :  sta WSYNC
    dex
    bne :-
+
+   SCORE digits1_0, digits02_0
 
    lda #%00000010
    sta VBLANK                     ; end of screen - enter blanking
@@ -457,6 +458,13 @@ SIDE_SPRITES
 
 rabbit_sprites_0:
 WHITE_RABBIT_SPRITES
+
+; Score digits
+digits1_0:
+DIGITS_1
+
+digits02_0:
+DIGITS_02
 
 .org $1FFA
 .segment "VECTORS"
