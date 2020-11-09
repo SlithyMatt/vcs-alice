@@ -45,7 +45,7 @@ SCORE_INC = 1
    tax
    ldy #0
 :  lda digits02,x
-   and #$F0
+   and #$0F
    sta SCORE_PF2,y
    inx
    iny
@@ -57,7 +57,7 @@ SCORE_INC = 1
    tax
    ldy #0
 :  lda digits02,x
-   and #$0F
+   and #$F0
    ora SCORE_PF2,y
    sta SCORE_PF2,y
    inx
