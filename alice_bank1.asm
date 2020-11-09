@@ -63,7 +63,7 @@ level2:
 
 ; 37 scanlines of vertical blank...
 
-   ldx #36
+   ldx #35
 @vblank_loop:
    sta WSYNC
    dex
@@ -80,11 +80,16 @@ level2:
    ror
    sta PF1_R
    rol PF2_R
-
+   sta WSYNC
 
 ; 192 scanlines of picture...
 
+   SCORE digits1_1, digits02_1
+   lda #$10 ; dark brown
+   sta COLUPF
+
    ; First 8 lines: just playfield
+   ldx #0
    ldy #8
 @top8:
    sta WSYNC
@@ -242,7 +247,7 @@ level2:
    cpy #0
    bne @below_row_loop
    inx
-   cpx #24
+   cpx #22
    beq @end_screen
    lda #0
    sta PF2_R
@@ -268,7 +273,7 @@ level2:
    lda PF2_R
    eor #$0f
    sta PF2
-   ldy #8
+   ldy #7
    jmp @below_row_loop
 
 @end_screen:
@@ -366,6 +371,13 @@ level1_terrain:
 
 falling_sprites_1:
 FALLING_SPRITES
+
+; Score digits
+digits1_1:
+DIGITS_1
+
+digits02_1:
+DIGITS_02
 
 .org $3FFA
 .segment "VECTORS1"

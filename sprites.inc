@@ -10,7 +10,8 @@ SPRITES_INC = 1
 .byte 0,0
 .byte 0,0
 .byte $1C, $0C
-.byte $1C, $0E
+.byte $1C, $1E
+.byte $1C, $1C
 .byte $1C, $1C
 .byte $1C, $14
 .byte $0E, $0C
@@ -34,7 +35,8 @@ SPRITES_INC = 1
 .byte 0,0
 .byte 0,0
 .byte $1C, $0C
-.byte $1C, $0E
+.byte $1C, $1E
+.byte $1C, $1C
 .byte $1C, $1C
 .byte $1C, $14
 .byte $0E, $0C
@@ -52,7 +54,8 @@ SPRITES_INC = 1
 .byte $12, $13
 ; Jumping Frame
 .byte $1C, $0C
-.byte $1C, $0E
+.byte $1C, $1E
+.byte $1C, $1C
 .byte $1C, $1C
 .byte $1C, $14
 .byte $0E, $2C
@@ -121,6 +124,7 @@ SPRITES_INC = 1
 .byte 0,0
 .byte 0,0
 .byte 0,0
+.byte 0,0
 .byte $0E,$08
 .byte $0E,$08
 .byte $0E,$08
@@ -139,6 +143,7 @@ SPRITES_INC = 1
 .byte $0E,$0E
 .byte $0E,$07
 ; In Air
+.byte 0,0
 .byte 0,0
 .byte 0,0
 .byte $0E,$08
@@ -163,7 +168,7 @@ SPRITES_INC = 1
 .byte 0,0
 .byte 0,0
 ; Gone
-.repeat 23
+.repeat 24
 .byte $18,$01
 .endrepeat
 .endmacro

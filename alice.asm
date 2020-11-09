@@ -206,7 +206,7 @@ level1:
    beq @check_jump
    dec JUMP_CD
 @jump:
-   lda #92
+   lda #96
    sta OFFSET
    jmp @alice_frame_set
 @check_jump:
@@ -228,7 +228,7 @@ level1:
    lda #$08
    bit FRAME_CTR
    beq @alice_frame_set
-   lda #46
+   lda #48
    sta OFFSET
 @alice_frame_set:
    sta WSYNC
@@ -253,7 +253,7 @@ level1:
    lda #$08
    bit FRAME_CTR
    bne @rabbit_frame_set
-   lda #46
+   lda #48
    sta OFFSET
    lda #$D0
    sta HMP1
@@ -301,6 +301,8 @@ level1:
    bne @vblank_loop
 
    ; playfield
+   SCORE digits1_0, digits02_0
+
    lda #$9C
    sta COLUBK
    sta WSYNC
@@ -363,7 +365,7 @@ level1:
    lda #0
    sta PF1
    sta PF2
-   ldx #9
+   ldx #16
 :  sta WSYNC
    dex
    bne :-
@@ -412,7 +414,7 @@ level1:
    sta GRP1
    iny
    sta WSYNC
-   cpy #46
+   cpy #48
    bne @sprite_loop
 
    lda #0
@@ -424,12 +426,10 @@ level1:
    sta WSYNC
    lda #$C8 ; light green
    sta COLUBK
-   ldx #4
+   ldx #14
 :  sta WSYNC
    dex
    bne :-
-
-   SCORE digits1_0, digits02_0
 
    lda #%00000010
    sta VBLANK                     ; end of screen - enter blanking

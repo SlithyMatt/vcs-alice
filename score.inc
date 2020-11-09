@@ -1,16 +1,13 @@
 .ifndef SCORE_INC
 SCORE_INC = 1
 
-; Last 32 lines of display
+; 16 lines of display
 .macro SCORE digits1, digits02
    lda #0
    sta COLUBK
    sta PF0
    sta PF1
    sta PF2
-   lda #$96 ; blue
-   sta COLUPF
-   sta WSYNC
    lda SCORE_10K
    and #$0F
    asl
@@ -25,7 +22,8 @@ SCORE_INC = 1
    iny
    cpy #5
    bne :-
-   sta WSYNC
+   lda #$96 ; blue
+   sta COLUPF
    lda SCORE_100
    and #$F0
    lsr
@@ -39,7 +37,6 @@ SCORE_INC = 1
    iny
    cpy #5
    bne :-
-   sta WSYNC
    lda SCORE_100
    and #$0F
    asl
@@ -54,7 +51,6 @@ SCORE_INC = 1
    iny
    cpy #5
    bne :-
-   sta WSYNC
    lda SCORE_1
    and #$F0
    lsr
@@ -68,7 +64,6 @@ SCORE_INC = 1
    iny
    cpy #5
    bne :-
-   sta WSYNC
    lda SCORE_1
    and #$0F
    asl
@@ -83,22 +78,15 @@ SCORE_INC = 1
    iny
    cpy #5
    bne :-
-   sta WSYNC
-   sta WSYNC
    ldx #0
-   sta WSYNC
-:  ldy #4
+:  ldy #2
 :  lda SCORE_PF1,x
    sta PF1
    lda SCORE_PF2,x
    sta PF2
    nop
-   nop
-   nop
    lda SCORE_PF0,x
    sta PF0
-   nop
-   nop
    nop
    nop
    lda #0
@@ -110,14 +98,13 @@ SCORE_INC = 1
    nop
    sta PF0
    sta WSYNC
+   nop
+   nop
    dey
    bne :-
    inx
    cpx #5
    bne :--
-   sta WSYNC
-   sta WSYNC
-   sta WSYNC
    sta WSYNC
 .endmacro
 
