@@ -64,48 +64,32 @@ StartOfFrame:
    sta COLUBK
    lda #0 ; black
    sta COLUPF
-   sta WSYNC
-   sta WSYNC
+   ldx #4
+:  sta WSYNC
+   dex
+   bne :-
    ; "slithy GAMES"
-   PFLINE 2,$00,$89,$14,$10,$91,$26
-   PFLINE 2,$00,$89,$14,$10,$9B,$76
-   PFLINE 2,$00,$A9,$94,$B0,$DB,$52
-   PFLINE 2,$00,$A9,$9C,$A0,$55,$12
-   PFLINE 2,$00,$8D,$89,$80,$55,$36
-   PFLINE 2,$40,$8D,$8B,$80,$D5,$26
-   PFLINE 2,$60,$A9,$8A,$B0,$D1,$66
-   PFLINE 2,$20,$A9,$8A,$A0,$51,$42
-   PFLINE 2,$60,$A9,$8A,$A0,$51,$52
-   PFLINE 2,$40,$A9,$8A,$B0,$51,$52
-   PFLINE 2,$60,$A9,$0A,$90,$51,$76
-   PFLINE 2,$20,$A9,$0A,$90,$51,$26
-   PFLINE 4,$00,$00,$0C,$00,$00,$00
-   sta WSYNC
-   sta WSYNC
-   lda #0 ; black
-   sta COLUBK
-   lda #$0E ; white
-   sta COLUPF
-   sta WSYNC
-   sta WSYNC
-   sta WSYNC
-   sta WSYNC
-   ; "PRESENTS"
-   PFLINE 2,$00,$33,$4C,$B0,$2E,$02
-   PFLINE 2,$00,$2A,$25,$90,$A4,$01
-   PFLINE 2,$00,$3B,$6C,$B0,$64,$03
-   PFLINE 2,$00,$22,$45,$90,$24,$02
-   PFLINE 2,$00,$22,$2D,$B0,$24,$01
+   PFLINE 2,$60,$97,$AA,$E0,$76,$DB
+   PFLINE 2,$20,$97,$AA,$20,$55,$4A
+   PFLINE 2,$60,$92,$EE,$A0,$75,$DA
+   PFLINE 2,$40,$D2,$4A,$A0,$54,$8A
+   PFLINE 2,$60,$D2,$4A,$E0,$54,$DA
    lda #0
    sta PF0
    sta PF1
    sta PF2
-   ldx #8
+   ldx #4
 :  sta WSYNC
    dex
    bne :-
+   lda #0 ; black
+   sta COLUBK
    lda #$96 ; blue
    sta COLUPF
+   ldx #20
+:  sta WSYNC
+   dex
+   bne :-
    ; "ALICE"
    PFLINE 4,$00,$02,$82,$30,$31,$1F
    PFLINE 4,$00,$06,$82,$30,$79,$1F
@@ -170,10 +154,10 @@ StartOfFrame:
    lda #0
    sta PF1
    sta PF2
-   sta WSYNC
-   sta WSYNC
-
-
+   ldx #18
+:  sta WSYNC
+   dex
+   bne :-
 
    lda #%01000010
    sta VBLANK                     ; end of screen - enter blanking
