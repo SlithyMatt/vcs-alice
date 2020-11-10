@@ -20,6 +20,13 @@ Reset1:
    jmp start_bank1
    bit BANK2
 
+   ; Score digits
+digits1_1:
+   DIGITS_1
+
+digits02_1:
+   DIGITS_02
+
 start_bank1:
    lda #<falling_sprites_1
    sta PTR1
@@ -372,12 +379,6 @@ level1_terrain:
 falling_sprites_1:
 FALLING_SPRITES
 
-; Score digits
-digits1_1:
-DIGITS_1
-
-digits02_1:
-DIGITS_02
 
 .org $3FFA
 .segment "VECTORS1"
