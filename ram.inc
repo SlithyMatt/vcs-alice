@@ -19,5 +19,8 @@ SCORE_10K   = $8F
 SCORE_PF0   = $90 ; 5 bytes
 SCORE_PF1   = $95 ; 5 bytes
 SCORE_PF2   = $9A ; 5 bytes
+SHOW_BL     = $9F
+SHOW_M0     = $A0
+SHOW_M1     = $A1
 
 .endif

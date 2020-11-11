@@ -34,6 +34,10 @@ Clear:
    sta PTR2
    lda #>rabbit_sprites_0
    sta PTR2+1
+   lda #$02
+   sta SHOW_BL
+   sta SHOW_M0
+   sta SHOW_M1
 
 StartOfFrame:
 
@@ -69,11 +73,11 @@ StartOfFrame:
    dex
    bne :-
    ; "slithy GAMES"
-   PFLINE 2,$60,$97,$AA,$E0,$76,$DB
-   PFLINE 2,$20,$97,$AA,$20,$55,$4A
-   PFLINE 2,$60,$92,$EE,$A0,$75,$DA
-   PFLINE 2,$40,$D2,$4A,$A0,$54,$8A
-   PFLINE 2,$60,$D2,$4A,$E0,$54,$DA
+   PFLINE 2,$B0,$2E,$55,$E0,$76,$DB
+   PFLINE 2,$90,$2E,$55,$20,$55,$4A
+   PFLINE 2,$B0,$24,$77,$A0,$75,$DA
+   PFLINE 2,$A0,$A4,$25,$A0,$54,$8A
+   PFLINE 2,$B0,$A4,$25,$E0,$54,$DA
    lda #0
    sta PF0
    sta PF1
@@ -247,7 +251,7 @@ level1:
    inc COUNTER
    jmp @rabbit_frame_set
 @stop_rabbit:
-   lda #92
+   lda #96
    sta OFFSET
 @rabbit_frame_set:
    sta WSYNC
@@ -278,11 +282,12 @@ level1:
    sta WSYNC
    sta HMOVE
    sta WSYNC
-   ldx #33
+   ldx #32
 @vblank_loop:
    sta WSYNC
    dex
    bne @vblank_loop
+   sta WSYNC
 
    ; playfield
    SCORE digits1_0, digits02_0
@@ -349,6 +354,8 @@ level1:
    lda #0
    sta PF1
    sta PF2
+   sta NUSIZ0
+   sta NUSIZ1
    ldx #16
 :  sta WSYNC
    dex
@@ -356,9 +363,31 @@ level1:
    lda #$18 ; light brown
    sta COLUBK
    sta WSYNC
+   lda SHOW_M0
+   sta ENAM0
+   lda SHOW_M1
+   sta ENAM1
+   lda SHOW_BL
+   sta ENABL
+   lda #$66 ; purple
+   sta COLUP0
+   sta COLUP1
+   sta COLUPF
+   ldx #4
+:  dex
+   bne :-
+   sta RESM0
+   nop
+   nop
+   sta RESM1
+   nop
+   nop
+   sta RESBL
    sta WSYNC
    sta WSYNC
-
+   lda #$10
+   sta NUSIZ0
+   sta NUSIZ1
 
    ldy #0
    lda (PTR1),y
@@ -398,6 +427,10 @@ level1:
    sta GRP1
    iny
    sta WSYNC
+   lda #0
+   sta ENAM0
+   sta ENAM1
+   sta ENABL
    cpy #48
    bne @sprite_loop
 
@@ -422,17 +455,41 @@ level1:
    sta COLUBK
 
    ; 30 scanlines of overscan...
-   ldx #30
+   ldx #26
 @oscan_loop:
    sta WSYNC
    dex
    bne @oscan_loop
 
    bit CXPPMM
-   bpl @continue_level1
+   bpl @check_m0
+   sta CXCLR
+   ADD_SCORE 100
    jmp jump_b0b1
+@check_m0:
+   sta WSYNC
+   bit CXM0P
+   bvc @check_m1
+   lda #0
+   sta SHOW_M0
+   ADD_SCORE 10
+@check_m1:
+   sta WSYNC
+   bit CXM1P
+   bpl @check_ball
+   lda #0
+   sta SHOW_M1
+   ADD_SCORE 10
+@check_ball:
+   sta WSYNC
+   bit CXP0FB
+   bvc @continue_level1
+   lda #0
+   sta SHOW_BL
+   ADD_SCORE 10
 @continue_level1:
-
+   sta WSYNC
+   sta CXCLR
    jmp level1
 
 
@@ -444,6 +501,8 @@ rabbit_sprites_0:
 WHITE_RABBIT_SPRITES
 
 ; Score digits
+.org $1F5A
+.segment "DIGITS"
 digits1_0:
 DIGITS_1
 

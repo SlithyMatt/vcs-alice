@@ -232,5 +232,19 @@ SCORE_INC = 1
 .byte $EE
 .endmacro
 
+.macro ADD_SCORE amount
+sed
+clc
+lda SCORE_1
+adc #((amount .MOD 10) | (amount .MOD 100 / 10 * 16))
+sta SCORE_1
+lda SCORE_100
+adc #((amount / 100 .MOD 10) | (amount.MOD 10000 / 1000 * 16))
+sta SCORE_100
+lda SCORE_10K
+adc #0
+sta SCORE_10K
+cld
+.endmacro
 
 .endif

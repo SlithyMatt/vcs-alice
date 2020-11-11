@@ -3,8 +3,8 @@ SPRITES_INC = 1
 
 .macro SIDE_SPRITES
 ; Standing Frame
-.byte 0,0
-.byte 0,0
+.byte $66,0
+.byte $66,0
 .byte 0,0
 .byte 0,0
 .byte 0,0
@@ -28,8 +28,8 @@ SPRITES_INC = 1
 .byte $0E, $08
 .byte $12, $0C
 ; Running Frame
-.byte 0,0
-.byte 0,0
+.byte $66,0
+.byte $66,0
 .byte 0,0
 .byte 0,0
 .byte 0,0
@@ -118,8 +118,8 @@ SPRITES_INC = 1
 
 .macro WHITE_RABBIT_SPRITES
 ; On ground
-.byte 0,0
-.byte 0,0
+.byte $66,0
+.byte $66,0
 .byte 0,0
 .byte 0,0
 .byte 0,0
@@ -143,8 +143,8 @@ SPRITES_INC = 1
 .byte $0E,$0E
 .byte $0E,$07
 ; In Air
-.byte 0,0
-.byte 0,0
+.byte $66,0
+.byte $66,0
 .byte 0,0
 .byte $0E,$08
 .byte $0E,$08
@@ -168,7 +168,9 @@ SPRITES_INC = 1
 .byte 0,0
 .byte 0,0
 ; Gone
-.repeat 24
+.byte $66,0
+.byte $66,0
+.repeat 22
 .byte $18,$01
 .endrepeat
 .endmacro
