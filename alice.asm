@@ -356,6 +356,7 @@ level1:
    sta PF2
    sta NUSIZ0
    sta NUSIZ1
+   sta CTRLPF
    ldx #16
 :  sta WSYNC
    dex
@@ -388,6 +389,7 @@ level1:
    lda #$10
    sta NUSIZ0
    sta NUSIZ1
+   sta CTRLPF
 
    ldy #0
    lda (PTR1),y
