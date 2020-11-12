@@ -6,6 +6,14 @@
 .include "sprites.inc"
 .include "playfield.inc"
 
+.macro LEVEL1_LOOP_INC_OFFSET
+   inx
+   cpx #22
+   bne :+
+   ldx #1
+:  nop
+.endmacro
+
 .org $3000
 .segment "BANK1"
 Reset1:
@@ -33,6 +41,7 @@ start_bank1:
    lda #>falling_sprites_1
    sta PTR1+1
    lda #0
+   sta FRAME_CTR
    sta OFFSET
    sta JUMP_CD
    sta RELEASED
@@ -64,6 +73,26 @@ level2:
    sta RESP0
 @started:
    sta WSYNC
+   inc FRAME_CTR
+   lda #$07
+   bit FRAME_CTR
+   bne @frame_set
+   inc OFFSET
+   lda COUNTER
+   cmp #6
+   bpl @check_stop
+   lda OFFSET
+   cmp #22
+   bne @frame_set
+   lda #1
+   sta OFFSET
+   jmp @frame_set
+@check_stop:
+   lda OFFSET
+   cmp #61
+   bne @frame_set
+   dec OFFSET
+@frame_set:
    sta WSYNC
    lda #0
    sta VSYNC
@@ -78,7 +107,7 @@ level2:
 
    lda #0
    sta PF2_R
-   ldx COUNTER
+   ldx OFFSET
    lda level1_terrain,x
    sec
    ror
@@ -96,7 +125,6 @@ level2:
    sta COLUPF
 
    ; First 8 lines: just playfield
-   ldx #0
    ldy #8
 @top8:
    sta WSYNC
@@ -109,10 +137,7 @@ level2:
    nop
    nop
    nop
-   nop
-   nop
-   nop
-   nop
+   LEVEL1_LOOP_INC_OFFSET
    lda PF1_R
    eor #$ff
    sta PF1
@@ -121,7 +146,6 @@ level2:
    sta PF2
    dey
    bne @top8
-   inx
    lda level1_terrain,x
    sec
    ror
@@ -162,9 +186,7 @@ level2:
    iny
    lda PF1_R
    eor #$ff
-   nop
-   nop
-   nop
+   LEVEL1_LOOP_INC_OFFSET
    sta PF1
    lda PF2_R
    eor #$0f
@@ -172,7 +194,6 @@ level2:
    cpy #16
    bmi @start_alice
    bne @check_end
-   inx
    lda #0
    sta PF2_R
    lda level1_terrain,x
@@ -202,7 +223,7 @@ level2:
 @check_end:
    cpy #32
    bne @start_alice
-   inx
+   LEVEL1_LOOP_INC_OFFSET
    lda #0
    sta PF2_R
    sta GRP0
@@ -240,10 +261,7 @@ level2:
    nop
    nop
    nop
-   nop
-   nop
-   nop
-   nop
+   LEVEL1_LOOP_INC_OFFSET
    lda PF1_R
    eor #$ff
    sta PF1
@@ -253,8 +271,7 @@ level2:
    dey
    cpy #0
    bne @below_row_loop
-   inx
-   cpx #22
+   cpx OFFSET
    beq @end_screen
    lda #0
    sta PF2_R
