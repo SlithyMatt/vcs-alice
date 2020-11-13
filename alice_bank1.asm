@@ -10,8 +10,8 @@
    inx
    cpx #22
    bne :+
-   ldx #1
-:  nop
+   ldx #0
+:  lda #0
 .endmacro
 
 .org $3000
@@ -80,11 +80,11 @@ level2:
    inc OFFSET
    lda COUNTER
    cmp #6
-   bpl @check_stop
+   ;bpl @check_stop
    lda OFFSET
    cmp #22
    bne @frame_set
-   lda #1
+   lda #0
    sta OFFSET
    jmp @frame_set
 @check_stop:
@@ -125,6 +125,7 @@ level2:
    sta COLUPF
 
    ; First 8 lines: just playfield
+   ldx OFFSET
    ldy #8
 @top8:
    sta WSYNC
@@ -137,7 +138,11 @@ level2:
    nop
    nop
    nop
-   LEVEL1_LOOP_INC_OFFSET
+   nop
+   nop
+   nop
+   nop
+   nop
    lda PF1_R
    eor #$ff
    sta PF1
@@ -146,6 +151,8 @@ level2:
    sta PF2
    dey
    bne @top8
+   LEVEL1_LOOP_INC_OFFSET
+   sta PF2_R
    lda level1_terrain,x
    sec
    ror
@@ -186,7 +193,9 @@ level2:
    iny
    lda PF1_R
    eor #$ff
-   LEVEL1_LOOP_INC_OFFSET
+   nop
+   nop
+   nop
    sta PF1
    lda PF2_R
    eor #$0f
@@ -194,7 +203,7 @@ level2:
    cpy #16
    bmi @start_alice
    bne @check_end
-   lda #0
+   LEVEL1_LOOP_INC_OFFSET
    sta PF2_R
    lda level1_terrain,x
    sec
@@ -224,7 +233,6 @@ level2:
    cpy #32
    bne @start_alice
    LEVEL1_LOOP_INC_OFFSET
-   lda #0
    sta PF2_R
    sta GRP0
    lda level1_terrain,x
@@ -238,6 +246,10 @@ level2:
    rol PF2_R
    lda PF2_R
    sta PF2
+   nop
+   nop
+   nop
+   nop
    nop
    lda PF1_R
    eor #$ff
@@ -261,7 +273,11 @@ level2:
    nop
    nop
    nop
-   LEVEL1_LOOP_INC_OFFSET
+   nop
+   nop
+   nop
+   nop
+   nop
    lda PF1_R
    eor #$ff
    sta PF1
@@ -271,9 +287,9 @@ level2:
    dey
    cpy #0
    bne @below_row_loop
+   LEVEL1_LOOP_INC_OFFSET
    cpx OFFSET
    beq @end_screen
-   lda #0
    sta PF2_R
    lda level1_terrain,x
    sec
@@ -319,7 +335,6 @@ level2:
 level1_terrain:
 .byte $F0
 .byte $F0
-.byte $F0
 .byte $E0
 .byte $C0
 .byte $C0
@@ -338,6 +353,7 @@ level1_terrain:
 .byte $F8
 .byte $F8
 .byte $F8
+.byte $F0
 .byte $F0
 .byte $E0
 .byte $C0
