@@ -73,6 +73,8 @@ level2:
    sta RESP0
 @started:
    sta WSYNC
+   bit DEAD
+   bmi @frame_set
    inc FRAME_CTR
    lda #$07
    bit FRAME_CTR
@@ -105,6 +107,9 @@ level2:
    sta WSYNC
    dex
    bne @vblank_loop
+
+   bit DEAD
+   bmi @movement_set
 
    bit SWCHA
    bmi @check_left
@@ -237,8 +242,6 @@ level2:
    bne @check_end
    LEVEL1_LOOP_INC_OFFSET
    sta PF2_R
-   lda #$96
-   sta COLUP0
    lda level1_terrain,x
    sec
    ror
@@ -351,11 +354,32 @@ level2:
    sta VBLANK                     ; end of screen - enter blanking
 
 ; 30 scanlines of overscan...
-   ldx #30
+   ldx #28
 @oscan_loop:
    sta WSYNC
    dex
    bne @oscan_loop
+
+   bit DEAD
+   bpl @check_pf
+   bit INPT4
+   bmi @check_pf
+   lda #0
+   sta DEAD
+   sta SCORE_1
+   sta SCORE_100
+   sta SCORE_10K
+   sta WSYNC
+   sta WSYNC
+   jmp start_bank1
+@check_pf:
+   sta WSYNC
+   bit CXP0FB
+   bpl @continue_level2
+   lda #$80
+   sta DEAD
+@continue_level2:
+   sta WSYNC
    sta CXCLR
    jmp level2
 

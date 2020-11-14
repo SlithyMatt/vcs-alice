@@ -88,7 +88,7 @@ SPRITES_INC = 1
 .byte $0E,$2D
 .byte $0E,$1E
 .byte $0E,$0C
-.byte $0E,$0C
+.byte $96,$0C
 .byte $96,$1E
 .byte $96,$1E
 .byte $96,$1E
@@ -105,7 +105,7 @@ SPRITES_INC = 1
 .byte $0E,$0C
 .byte $0E,$1E
 .byte $0E,$2D
-.byte $0E,$0C
+.byte $96,$0C
 .byte $96,$1E
 .byte $96,$1E
 .byte $96,$1E
