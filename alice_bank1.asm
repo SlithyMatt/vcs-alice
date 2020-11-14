@@ -36,6 +36,10 @@ digits02_1:
    DIGITS_02
 
 start_bank1:
+   lda #<falling_sprites_1
+   sta PTR1
+   lda #>falling_sprites_1
+   sta PTR1+1
    lda #0
    sta FRAME_CTR
    sta OFFSET
@@ -92,15 +96,28 @@ level2:
    sta WSYNC
    lda #0
    sta VSYNC
+   sta HMP0
 
 ; 37 scanlines of vertical blank...
 
-   ldx #34
+   ldx #33
 @vblank_loop:
    sta WSYNC
    dex
    bne @vblank_loop
 
+   bit SWCHA
+   bmi @check_left
+   lda #$F0
+   sta HMP0
+   jmp @movement_set
+@check_left:
+   bvs @movement_set
+   lda #$10
+   sta HMP0
+@movement_set:
+   sta WSYNC
+   sta HMOVE
    lda #$07
    bit FRAME_CTR
    bne @alice_frame_set
@@ -263,7 +280,6 @@ level2:
    lda #0
    sta GRP0
    nop
-   nop
    lda PF1_R
    eor #$ff
    sta PF1
@@ -340,7 +356,7 @@ level2:
    sta WSYNC
    dex
    bne @oscan_loop
-
+   sta CXCLR
    jmp level2
 
 ; Graphics Data
