@@ -36,10 +36,6 @@ digits02_1:
    DIGITS_02
 
 start_bank1:
-   lda #<falling_sprites_1
-   sta PTR1
-   lda #>falling_sprites_1
-   sta PTR1+1
    lda #0
    sta FRAME_CTR
    sta OFFSET
@@ -99,12 +95,31 @@ level2:
 
 ; 37 scanlines of vertical blank...
 
-   ldx #35
+   ldx #34
 @vblank_loop:
    sta WSYNC
    dex
    bne @vblank_loop
 
+   lda #$07
+   bit FRAME_CTR
+   bne @alice_frame_set
+   lda #<falling_sprites_1
+   sta PTR1
+   lda #>falling_sprites_1
+   sta PTR1+1
+   lda #$08
+   bit FRAME_CTR
+   beq @alice_frame_set
+   clc
+   lda PTR1
+   adc #32
+   sta PTR1
+   lda PTR1+1
+   adc #0
+   sta PTR1+1
+@alice_frame_set:
+   sta WSYNC
    lda #0
    sta PF2_R
    ldx OFFSET
@@ -205,22 +220,22 @@ level2:
    bne @check_end
    LEVEL1_LOOP_INC_OFFSET
    sta PF2_R
+   lda #$96
+   sta COLUP0
    lda level1_terrain,x
    sec
    ror
    rol PF2_R
    sec
    ror
-   sta PF1_R
    sta PF1
+   sta PF1_R
    rol PF2_R
    lda PF2_R
    sta PF2
    iny
    lda (PTR1),y
    sta GRP0
-   lda #$96
-   sta COLUP0
    lda PF1_R
    eor #$ff
    sta PF1
@@ -234,7 +249,6 @@ level2:
    bne @start_alice
    LEVEL1_LOOP_INC_OFFSET
    sta PF2_R
-   sta GRP0
    lda level1_terrain,x
    sec
    ror
@@ -246,9 +260,8 @@ level2:
    rol PF2_R
    lda PF2_R
    sta PF2
-   nop
-   nop
-   nop
+   lda #0
+   sta GRP0
    nop
    nop
    lda PF1_R
