@@ -82,12 +82,13 @@ level2:
    inc OFFSET
    lda COUNTER
    cmp #6
-   ;bpl @check_stop
+   bpl @check_stop
    lda OFFSET
    cmp #22
    bne @frame_set
    lda #0
    sta OFFSET
+   inc COUNTER
    jmp @frame_set
 @check_stop:
    lda OFFSET
@@ -164,6 +165,10 @@ level2:
    ; First 8 lines: just playfield
    ldx OFFSET
    ldy #8
+   lda COUNTER
+   cmp #6
+   bmi @top8
+   jmp @top8_bottom
 @top8:
    sta WSYNC
    lda PF1_R
@@ -217,7 +222,6 @@ level2:
    ; Lines 8-23: playfield + sprite
 @start_alice:
    sta WSYNC
-@start_alice_skip_wsync:
    lda PF1_R
    sta PF1
    lda PF2_R
@@ -317,7 +321,6 @@ level2:
    eor #$0f
    sta PF2
    dey
-   cpy #0
    bne @below_row_loop
    LEVEL1_LOOP_INC_OFFSET
    cpx OFFSET
@@ -382,6 +385,286 @@ level2:
    sta WSYNC
    sta CXCLR
    jmp level2
+
+@top8_bottom:
+   sta WSYNC
+   lda PF1_R
+   sta PF1
+   lda PF2_R
+   sta PF2
+   clc
+   lda OFFSET
+   adc #22
+   sta LAST
+   nop
+   nop
+   nop
+   nop
+   nop
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   dey
+   bne @top8_bottom
+   inx
+   lda #0
+   sta PF2_R
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
+   sta PF1_R
+   sta PF1
+   rol PF2_R
+   lda PF2_R
+   sta PF2
+   lda (PTR1),y
+   sta COLUP0
+   iny
+   lda (PTR1),y
+   sta GRP0
+   iny
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+
+; Lines 8-23: playfield + sprite
+@start_alice_bottom:
+   sta WSYNC
+   lda PF1_R
+   sta PF1
+   lda PF2_R
+   sta PF2
+   lda (PTR1),y
+   sta COLUP0
+   iny
+   lda (PTR1),y
+   sta GRP0
+   iny
+   lda PF1_R
+   eor #$ff
+   nop
+   nop
+   nop
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   cpy #16
+   bmi @start_alice_bottom
+   bne @check_end_bottom
+   inx
+   lda #0
+   sta PF2_R
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
+   sta PF1
+   sta PF1_R
+   rol PF2_R
+   lda PF2_R
+   sta PF2
+   iny
+   lda (PTR1),y
+   sta GRP0
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   iny
+   jmp @start_alice_bottom
+@check_end_bottom:
+   cpy #32
+   bne @start_alice_bottom
+   inx
+   lda #0
+   sta PF2_R
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
+   sta PF1_R
+   sta PF1
+   rol PF2_R
+   lda PF2_R
+   sta PF2
+   lda #0
+   sta GRP0
+   nop
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   sta WSYNC
+
+   ldy #7
+   jmp @below_row_skip_wsync_bottom
+@below_row_loop_bottom:
+   sta WSYNC
+@below_row_skip_wsync_bottom:
+   lda PF1_R
+   sta PF1
+   lda PF2_R
+   sta PF2
+   cpx #73
+   beq @floor
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   dey
+   bne @below_row_loop_bottom
+   inx
+   cpx LAST
+   beq @end_screen_bottom
+   lda #0
+   sta PF2_R
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
+   sta PF1_R
+   sta PF1
+   rol PF2_R
+   lda PF2_R
+   sta PF2
+   nop
+   nop
+   nop
+   nop
+   nop
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   ldy #7
+   jmp @below_row_loop_bottom
+@end_screen_bottom:
+   jmp @end_screen
+
+@floor:
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   dey
+@last_terrain:
+   sta WSYNC
+   lda PF1_R
+   sta PF1
+   lda PF2_R
+   sta PF2
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   dey
+   bne @last_terrain
+   inx
+   cpx LAST
+   beq @end_screen_bottom
+@above_door:
+   ldy #8
+@above_door_row:
+   sta WSYNC
+   lda #$FF
+   sta PF1
+   lda #0
+   sta PF2
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   sta PF1
+   dey
+   bne @above_door_row
+   inx
+   cpx LAST
+   beq @end_screen_bottom
+   cpx #79
+   bne @above_door
+@floor_start:
+   ldy #8
+@floor_row:
+   sta WSYNC
+   lda #0
+   sta PF0
+   lda #$FF
+   sta PF1
+   sta PF2
+   nop
+   nop
+   nop
+   nop
+   nop
+   nop
+   lda #$F0
+   sta PF0
+   dey
+   bne @floor_row
+   inx
+   cpx LAST
+   bne @floor_start
+   jmp @end_screen_bottom
+
 
 ; Graphics Data
 

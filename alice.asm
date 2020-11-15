@@ -417,6 +417,32 @@ level1:
    sta START
 @move:
    sta WSYNC
+   lda (PTR1),y
+   sta COLUP0
+   lda (PTR2),y
+   sta COLUP1
+   iny
+   lda (PTR1),y
+   sta GRP0
+   lda (PTR2),y
+   sta GRP1
+   iny
+   sta WSYNC
+   lda (PTR1),y
+   sta COLUP0
+   lda (PTR2),y
+   sta COLUP1
+   iny
+   lda (PTR1),y
+   sta GRP0
+   lda (PTR2),y
+   sta GRP1
+   iny
+   lda #0
+   sta ENAM0
+   sta ENAM1
+   sta ENABL
+   sta WSYNC
 @sprite_loop:
    lda (PTR1),y
    sta COLUP0
@@ -429,10 +455,6 @@ level1:
    sta GRP1
    iny
    sta WSYNC
-   lda #0
-   sta ENAM0
-   sta ENAM1
-   sta ENABL
    cpy #48
    bne @sprite_loop
 

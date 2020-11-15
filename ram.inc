@@ -23,5 +23,6 @@ SHOW_BL     = $9F
 SHOW_M0     = $A0
 SHOW_M1     = $A1
 DEAD        = $A2
+LAST        = $A3
 
 .endif
