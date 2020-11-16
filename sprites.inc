@@ -114,6 +114,23 @@ SPRITES_INC = 1
 .byte $96,$3F
 .byte $0E,$0C
 .byte $12,$12
+; Umbrella
+.byte $1C,$70
+.byte $1C,$A8
+.byte $1C,$2D
+.byte $1C,$3E
+.byte $3E,$2C
+.byte $3E,$2C
+.byte $0E,$2C
+.byte $0E,$1F
+.byte $96,$0C
+.byte $96,$1E
+.byte $96,$1E
+.byte $96,$1E
+.byte $96,$3F
+.byte $96,$3F
+.byte $96,$3F
+.byte $12,$12
 .endmacro
 
 .macro WHITE_RABBIT_SPRITES

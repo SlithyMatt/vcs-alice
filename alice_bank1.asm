@@ -50,6 +50,8 @@ start_bank1:
    sta COLUBK
    lda #$10 ; dark brown
    sta COLUPF
+   lda #$66 ; purple
+   sta COLUP1
 
 level2:
 
@@ -91,6 +93,8 @@ level2:
    inc COUNTER
    jmp @frame_set
 @check_stop:
+   lda #$1C
+   sta COLUP1
    lda OFFSET
    cmp #61
    bne @frame_set
@@ -744,6 +748,47 @@ level1_terrain:
 .byte $F0
 .byte $F8
 
+level2_cake_up:
+.byte $D8
+.byte $DB
+.byte 0
+.byte 0
+.byte $D8
+.byte $DB
+.byte $20
+
+level2_cake_down:
+.repeat 2
+.byte 0,0
+.byte $20,0
+.byte $D8,0
+.byte $DB,0
+.byte 0,0
+.byte 0,0
+.byte $D8,0
+.byte $DB,0
+.endrepeat
+
+level2_umbrella_up:
+.byte $0C
+.byte $08
+.byte $08
+.byte $08
+.byte $2A
+.byte $1C
+.byte $08
+
+level2_umbrella_down:
+.repeat 2
+.byte 0,0
+.byte $08,0
+.byte $1C,0
+.byte $2A,0
+.byte $08,0
+.byte $08,0
+.byte $08,0
+.byte $0C,0
+.endrepeat
 
 falling_sprites_1:
 FALLING_SPRITES
