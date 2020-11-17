@@ -73,6 +73,8 @@ level2:
 :  dex
    bne :-
    sta RESP0
+   lda #$FF
+   sta INDEX
 @started:
    sta WSYNC
    bit DEAD
@@ -107,12 +109,101 @@ level2:
 
 ; 37 scanlines of vertical blank...
 
-   ldx #33
+   ldx #31
 @vblank_loop:
    sta WSYNC
    dex
    bne @vblank_loop
 
+   lda COUNTER
+   cmp #1
+   bmi @p1_set_right
+   bne @check_bonus_2
+   lda #12
+   sta INDEX
+   jmp @p1_set_right
+@check_bonus_2:
+   lda COUNTER
+   cmp #3
+   bmi @p1_set_right
+   bne @check_bonus_3
+   lda #4
+   sta INDEX
+   jmp @p1_set_left
+@check_bonus_3:
+   lda COUNTER
+   cmp #4
+   bne @check_bonus_4
+   lda #12
+   sta INDEX
+   jmp @p1_set_right
+@check_bonus_4:
+   lda COUNTER
+   cmp #6
+   bmi @p1_set_right
+   lda OFFSET
+   cmp #22
+   bpl @set_umbrella
+   lda #4
+   sta INDEX
+   jmp @p1_set_left
+@set_umbrella:
+   sta WSYNC
+   ldx #2
+:  dex
+   bne :-
+   sta RESP1
+   lda #42
+   sta INDEX
+   lda OFFSET
+   cmp #40
+   bmi @set_umbrella_up
+   cmp #42
+   bpl @set_umbrella_up
+   lda #<level2_umbrella_down
+   sta PTR2
+   lda #>level2_umbrella_down
+   sta PTR2+1
+   jmp @p1_set
+@set_umbrella_up:
+   lda #<level2_umbrella_up
+   sta PTR2
+   lda #>level2_umbrella_up
+   sta PTR2+1
+   jmp @p1_set
+@p1_set_left:
+   sta WSYNC
+   ldx #3
+:  dex
+   bne :-
+   sta RESP1
+   jmp @set_cake_ptr
+@p1_set_right:
+   sta WSYNC
+   ldx #10
+:  dex
+   bne :-
+   sta RESP1
+@set_cake_ptr:
+   lda INDEX
+   sec
+   sbc OFFSET
+   cmp #1
+   beq @set_cake_down
+   cmp #2
+   beq @set_cake_down
+   lda #<level2_cake_up
+   sta PTR2
+   lda #>level2_cake_up
+   sta PTR2+1
+   jmp @p1_set
+@set_cake_down:
+   lda #<level2_cake_down
+   sta PTR2
+   lda #>level2_cake_down
+   sta PTR2+1
+@p1_set:
+   sta WSYNC
    bit DEAD
    bmi @movement_set
 
@@ -179,15 +270,15 @@ level2:
    sta PF1
    lda PF2_R
    sta PF2
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop
+   cpx INDEX
+   bne @top8_no_p1
+   lda (PTR2),y
+   sta GRP1
+   jmp @top8_p1_set
+@top8_no_p1:
+   lda #0
+   sta GRP1
+@top8_p1_set:
    nop
    lda PF1_R
    eor #$ff
@@ -238,9 +329,15 @@ level2:
    iny
    lda PF1_R
    eor #$ff
-   nop
-   nop
-   nop
+   cpx INDEX
+   bne @alice_no_p1
+   lda (PTR2),y
+   sta GRP1
+   jmp @alice_p1_set
+@alice_no_p1:
+   lda #0
+   sta GRP1
+@alice_p1_set:
    sta PF1
    lda PF2_R
    eor #$0f
@@ -308,15 +405,15 @@ level2:
    sta PF1
    lda PF2_R
    sta PF2
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop
+   cpx INDEX
+   bne @loop_no_p1
+   lda (PTR2),y
+   sta GRP1
+   jmp @loop_p1_set
+@loop_no_p1:
+   lda #0
+   sta GRP1
+@loop_p1_set:
    nop
    lda PF1_R
    eor #$ff
@@ -400,11 +497,15 @@ level2:
    lda OFFSET
    adc #22
    sta LAST
-   nop
-   nop
-   nop
-   nop
-   nop
+   cpx INDEX
+   bne @top8_bottom_no_p1
+   lda (PTR2),y
+   sta GRP1
+   jmp @top8_bottom_p1_set
+@top8_bottom_no_p1:
+   lda #0
+   sta GRP1
+@top8_bottom_p1_set:
    lda PF1_R
    eor #$ff
    sta PF1
@@ -455,9 +556,15 @@ level2:
    iny
    lda PF1_R
    eor #$ff
-   nop
-   nop
-   nop
+   cpx INDEX
+   bne @alice_bottom_no_p1
+   lda (PTR2),y
+   sta GRP1
+   jmp @alice_bottom_p1_set
+@alice_bottom_no_p1:
+   lda #0
+   sta GRP1
+@alice_bottom_p1_set:
    sta PF1
    lda PF2_R
    eor #$0f
@@ -529,12 +636,15 @@ level2:
    sta PF2
    cpx #73
    beq @floor
-   nop
-   nop
-   nop
-   nop
-   nop
-   nop
+   cpx INDEX
+   bne @bottom_loop_no_p1
+   lda (PTR2),y
+   sta GRP1
+   jmp @bottom_loop_p1_set
+@bottom_loop_no_p1:
+   lda #0
+   sta GRP1
+@bottom_loop_p1_set:
    nop
    lda PF1_R
    eor #$ff
@@ -756,6 +866,7 @@ level2_cake_up:
 .byte $D8
 .byte $DB
 .byte $20
+.byte 0
 
 level2_cake_down:
 .repeat 2
@@ -777,6 +888,7 @@ level2_umbrella_up:
 .byte $2A
 .byte $1C
 .byte $08
+.byte 0
 
 level2_umbrella_down:
 .repeat 2
