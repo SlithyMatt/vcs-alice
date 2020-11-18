@@ -28,12 +28,13 @@ Reset1:
    jmp start_bank1
    bit BANK2
 
-   ; Score digits
+   ; Graphics Data
+
+falling_sprites_1:
+   FALLING_SPRITES
+
 digits1_1:
    DIGITS_1
-
-digits02_1:
-   DIGITS_02
 
 start_bank1:
    lda #<falling_sprites_1
@@ -61,6 +62,7 @@ level2:
    sta PF0
    sta PF1
    sta PF2
+   sta GRP1
 
    lda #2
    sta VSYNC
@@ -149,7 +151,7 @@ level2:
    jmp @p1_set_left
 @set_umbrella:
    sta WSYNC
-   ldx #2
+   ldx #5
 :  dex
    bne :-
    sta RESP1
@@ -173,16 +175,18 @@ level2:
    jmp @p1_set
 @p1_set_left:
    sta WSYNC
-   ldx #3
+   ldx #6
 :  dex
    bne :-
    sta RESP1
    jmp @set_cake_ptr
 @p1_set_right:
    sta WSYNC
-   ldx #10
+   ldx #11
 :  dex
    bne :-
+   nop
+   nop
    sta RESP1
 @set_cake_ptr:
    lda INDEX
@@ -280,6 +284,9 @@ level2:
    sta GRP1
 @top8_p1_set:
    nop
+   nop
+   nop
+   nop
    lda PF1_R
    eor #$ff
    sta PF1
@@ -316,7 +323,18 @@ level2:
 
    ; Lines 8-23: playfield + sprite
 @start_alice:
+   cpx INDEX
+   bne @alice_no_p1
+   lda (PTR2),y
+   nop
+   nop
+   nop
+   jmp @alice_p1_set
+@alice_no_p1:
+   lda #0
    sta WSYNC
+@alice_p1_set:
+   sta GRP1
    lda PF1_R
    sta PF1
    lda PF2_R
@@ -326,22 +344,13 @@ level2:
    iny
    lda (PTR1),y
    sta GRP0
-   iny
    lda PF1_R
    eor #$ff
-   cpx INDEX
-   bne @alice_no_p1
-   lda (PTR2),y
-   sta GRP1
-   jmp @alice_p1_set
-@alice_no_p1:
-   lda #0
-   sta GRP1
-@alice_p1_set:
    sta PF1
    lda PF2_R
    eor #$0f
    sta PF2
+   iny
    cpy #16
    bmi @start_alice
    bne @check_end
@@ -414,6 +423,10 @@ level2:
    lda #0
    sta GRP1
 @loop_p1_set:
+   nop
+   nop
+   nop
+   nop
    nop
    lda PF1_R
    eor #$ff
@@ -506,6 +519,8 @@ level2:
    lda #0
    sta GRP1
 @top8_bottom_p1_set:
+   nop
+   nop
    lda PF1_R
    eor #$ff
    sta PF1
@@ -540,10 +555,11 @@ level2:
    lda PF2_R
    eor #$0f
    sta PF2
+   sta WSYNC
 
 ; Lines 8-23: playfield + sprite
 @start_alice_bottom:
-   sta WSYNC
+   ;sta WSYNC
    lda PF1_R
    sta PF1
    lda PF2_R
@@ -554,8 +570,6 @@ level2:
    lda (PTR1),y
    sta GRP0
    iny
-   lda PF1_R
-   eor #$ff
    cpx INDEX
    bne @alice_bottom_no_p1
    lda (PTR2),y
@@ -565,6 +579,8 @@ level2:
    lda #0
    sta GRP1
 @alice_bottom_p1_set:
+   lda PF1_R
+   eor #$ff
    sta PF1
    lda PF2_R
    eor #$0f
@@ -780,7 +796,44 @@ level2:
    jmp @end_screen_bottom
 
 
-; Graphics Data
+; More graphics
+
+digits02_1:
+   DIGITS_02
+
+level2_cake_up:
+.byte $D8
+.byte $D8
+.byte 0
+.byte 0
+.byte $D8
+.byte $D8
+.byte $20
+.byte 0
+
+level2_cake_down:
+.repeat 2
+.byte 0,0
+.byte $20,0
+.byte $D8,0
+.byte $D8,0
+.byte 0,0
+.byte 0,0
+.byte $D8,0
+.byte $D8,0
+.endrepeat
+
+level2_umbrella_up:
+.byte $0C
+.byte $08
+.byte $08
+.byte $08
+.byte $2A
+.byte $1C
+.byte $08
+.byte 0
+
+.res 17 ; filler
 
 level1_terrain:
 .byte $F0
@@ -858,37 +911,8 @@ level1_terrain:
 .byte $F0
 .byte $F8
 
-level2_cake_up:
-.byte $D8
-.byte $DB
-.byte 0
-.byte 0
-.byte $D8
-.byte $DB
-.byte $20
-.byte 0
 
-level2_cake_down:
-.repeat 2
-.byte 0,0
-.byte $20,0
-.byte $D8,0
-.byte $DB,0
-.byte 0,0
-.byte 0,0
-.byte $D8,0
-.byte $DB,0
-.endrepeat
 
-level2_umbrella_up:
-.byte $0C
-.byte $08
-.byte $08
-.byte $08
-.byte $2A
-.byte $1C
-.byte $08
-.byte 0
 
 level2_umbrella_down:
 .repeat 2
@@ -901,9 +925,6 @@ level2_umbrella_down:
 .byte $08,0
 .byte $0C,0
 .endrepeat
-
-falling_sprites_1:
-FALLING_SPRITES
 
 
 .org $3FFA
