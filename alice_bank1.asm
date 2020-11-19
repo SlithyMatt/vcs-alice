@@ -75,8 +75,6 @@ level2:
 :  dex
    bne :-
    sta RESP0
-   lda #$FF
-   sta INDEX
 @started:
    sta WSYNC
    bit DEAD
@@ -97,8 +95,6 @@ level2:
    inc COUNTER
    jmp @frame_set
 @check_stop:
-   lda #$1C
-   sta COLUP1
    lda OFFSET
    cmp #61
    bne @frame_set
@@ -117,39 +113,78 @@ level2:
    dex
    bne @vblank_loop
 
+   lda #$FF
+   sta INDEX
+   lda COUNTER
+   cmp #0
+   bne @check_bonus_1
+   lda OFFSET
+   cmp #13
+   bmi @no_bonus_0
+   jmp @p1_set_right
+@no_bonus_0:
+   sta WSYNC
+   jmp @p1_set
+@check_bonus_1:
    lda COUNTER
    cmp #1
-   bmi @p1_set_right
    bne @check_bonus_2
-   lda #12
-   sta INDEX
+   lda OFFSET
+   cmp #13
+   bpl @no_bonus_1
    jmp @p1_set_right
+@no_bonus_1:
+   sta WSYNC
+   jmp @p1_set
 @check_bonus_2:
    lda COUNTER
+   cmp #2
+   bne @check_counter_3
+   lda OFFSET
+   cmp #5
+   bpl @p1_set_left
+   sta WSYNC
+   jmp @p1_set
+@check_counter_3:
+   lda COUNTER
    cmp #3
-   bmi @p1_set_right
    bne @check_bonus_3
-   lda #4
-   sta INDEX
-   jmp @p1_set_left
+   lda OFFSET
+   cmp #5
+   bmi @p1_set_left
+   cmp #13
+   bpl @p1_set_right
+   sta WSYNC
+   jmp @p1_set
 @check_bonus_3:
    lda COUNTER
    cmp #4
    bne @check_bonus_4
-   lda #12
-   sta INDEX
-   jmp @p1_set_right
+   lda OFFSET
+   cmp #13
+   bmi @p1_set_right
+   sta WSYNC
+   jmp @p1_set
 @check_bonus_4:
    lda COUNTER
-   cmp #6
-   bmi @p1_set_right
+   cmp #5
+   bne @check_counter_6
    lda OFFSET
+   cmp #5
+   bpl @p1_set_left
+   sta WSYNC
+   jmp @p1_set
+@check_counter_6:
+   lda OFFSET
+   cmp #5
+   bmi @p1_set_left
    cmp #22
    bpl @set_umbrella
-   lda #4
-   sta INDEX
-   jmp @p1_set_left
+   sta WSYNC
+   jmp @p1_set
 @set_umbrella:
+   lda #$1C
+   sta COLUP1
    sta WSYNC
    ldx #5
 :  dex
@@ -174,6 +209,8 @@ level2:
    sta PTR2+1
    jmp @p1_set
 @p1_set_left:
+   lda #4
+   sta INDEX
    sta WSYNC
    ldx #6
 :  dex
@@ -181,6 +218,8 @@ level2:
    sta RESP1
    jmp @set_cake_ptr
 @p1_set_right:
+   lda #12
+   sta INDEX
    sta WSYNC
    ldx #11
 :  dex
@@ -321,19 +360,16 @@ level2:
    eor #$0f
    sta PF2
 
-   ; Lines 8-23: playfield + sprite
+   ; Lines 8-15: playfield + upper sprite
 @start_alice:
    cpx INDEX
    bne @alice_no_p1
    lda (PTR2),y
-   nop
-   nop
-   nop
    jmp @alice_p1_set
 @alice_no_p1:
    lda #0
-   sta WSYNC
 @alice_p1_set:
+   sta WSYNC
    sta GRP1
    lda PF1_R
    sta PF1
@@ -352,8 +388,7 @@ level2:
    sta PF2
    iny
    cpy #16
-   bmi @start_alice
-   bne @check_end
+   bne @start_alice
    LEVEL1_LOOP_INC_OFFSET
    sta PF2_R
    lda level1_terrain,x
@@ -377,10 +412,36 @@ level2:
    eor #$0f
    sta PF2
    iny
-   jmp @start_alice
-@check_end:
+
+   ; Lines 16-31: playfield + lower sprite
+@start_lower_alice:
+   cpx INDEX
+   bne @lower_alice_no_p1
+   lda (PTR2),y
+   jmp @lower_alice_p1_set
+@lower_alice_no_p1:
+   lda #0
+@lower_alice_p1_set:
+   sta WSYNC
+   sta GRP1
+   lda PF1_R
+   sta PF1
+   lda PF2_R
+   sta PF2
+   lda (PTR1),y
+   sta COLUP0
+   iny
+   lda (PTR1),y
+   sta GRP0
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   iny
    cpy #32
-   bne @start_alice
+   bne @start_lower_alice
    LEVEL1_LOOP_INC_OFFSET
    sta PF2_R
    lda level1_terrain,x
@@ -405,6 +466,7 @@ level2:
    sta PF2
    sta WSYNC
 
+; Lines 32-192: Below Alice
    ldy #7
    jmp @below_row_skip_wsync
 @below_row_loop:
@@ -555,11 +617,18 @@ level2:
    lda PF2_R
    eor #$0f
    sta PF2
-   sta WSYNC
 
-; Lines 8-23: playfield + sprite
+   ; Lines 8-15: playfield + upper sprite
 @start_alice_bottom:
-   ;sta WSYNC
+   cpx INDEX
+   bne @alice_bottom_no_p1
+   lda (PTR2),y
+   jmp @alice_bottom_p1_set
+@alice_bottom_no_p1:
+   lda #0
+@alice_bottom_p1_set:
+   sta WSYNC
+   sta GRP1
    lda PF1_R
    sta PF1
    lda PF2_R
@@ -569,52 +638,14 @@ level2:
    iny
    lda (PTR1),y
    sta GRP0
-   iny
-   cpx INDEX
-   bne @alice_bottom_no_p1
-   lda (PTR2),y
-   sta GRP1
-   jmp @alice_bottom_p1_set
-@alice_bottom_no_p1:
-   lda #0
-   sta GRP1
-@alice_bottom_p1_set:
    lda PF1_R
    eor #$ff
    sta PF1
    lda PF2_R
    eor #$0f
    sta PF2
+   iny
    cpy #16
-   bmi @start_alice_bottom
-   bne @check_end_bottom
-   inx
-   lda #0
-   sta PF2_R
-   lda level1_terrain,x
-   sec
-   ror
-   rol PF2_R
-   sec
-   ror
-   sta PF1
-   sta PF1_R
-   rol PF2_R
-   lda PF2_R
-   sta PF2
-   iny
-   lda (PTR1),y
-   sta GRP0
-   lda PF1_R
-   eor #$ff
-   sta PF1
-   lda PF2_R
-   eor #$0f
-   sta PF2
-   iny
-   jmp @start_alice_bottom
-@check_end_bottom:
-   cpy #32
    bne @start_alice_bottom
    inx
    lda #0
@@ -625,6 +656,60 @@ level2:
    rol PF2_R
    sec
    ror
+   sta PF1
+   sta PF1_R
+   rol PF2_R
+   lda PF2_R
+   sta PF2
+   iny
+   lda (PTR1),y
+   sta GRP0
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   iny
+
+   ; Lines 16-31: playfield + lower sprite
+@start_lower_alice_bottom:
+   cpx INDEX
+   bne @lower_alice_bottom_no_p1
+   lda (PTR2),y
+   jmp @lower_alice_bottom_p1_set
+@lower_alice_bottom_no_p1:
+   lda #0
+@lower_alice_bottom_p1_set:
+   sta WSYNC
+   sta GRP1
+   lda PF1_R
+   sta PF1
+   lda PF2_R
+   sta PF2
+   lda (PTR1),y
+   sta COLUP0
+   iny
+   lda (PTR1),y
+   sta GRP0
+   lda PF1_R
+   eor #$ff
+   sta PF1
+   lda PF2_R
+   eor #$0f
+   sta PF2
+   iny
+   cpy #32
+   bne @start_lower_alice_bottom
+   inx
+   lda #0
+   sta PF2_R
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
    sta PF1_R
    sta PF1
    rol PF2_R
@@ -632,6 +717,7 @@ level2:
    sta PF2
    lda #0
    sta GRP0
+   nop
    nop
    lda PF1_R
    eor #$ff
@@ -798,8 +884,7 @@ level2:
 
 ; More graphics
 
-digits02_1:
-   DIGITS_02
+
 
 level2_cake_up:
 .byte $D8
@@ -833,7 +918,8 @@ level2_umbrella_up:
 .byte $08
 .byte 0
 
-.res 17 ; filler
+digits02_1:
+   DIGITS_02
 
 level1_terrain:
 .byte $F0
