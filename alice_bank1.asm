@@ -105,10 +105,17 @@ level2:
    bne @frame_set
    dec OFFSET
 @frame_set:
+   lda OFFSET
+   cmp #60
+   bne @play
+   jmp end_level2
+@play:
    sta WSYNC
    lda #0
    sta VSYNC
    sta HMP0
+
+
 
 ; 37 scanlines of vertical blank...
 
@@ -155,7 +162,7 @@ level2:
    bvs @no_bonus_2
    lda OFFSET
    cmp #5
-   bpl @no_bonus
+   bpl @no_bonus_2
    jmp @p1_set_left
 @no_bonus:
    sta WSYNC
@@ -941,6 +948,43 @@ level2:
    bne @floor_start
    jmp @end_screen_bottom
 
+end_level2:
+   sta WSYNC
+   lda #0
+   sta VSYNC
+   sta HMP0
+
+; 37 scanlines of vertical blank...
+
+   ldx #36
+@vblank_loop:
+   sta WSYNC
+   dex
+   bne @vblank_loop
+
+   ldx #60
+
+@above_alice:
+   sta WSYNC
+
+; TODO screen lines
+   ldx #192
+@screen_line:
+   sta WSYNC
+   dex
+   bne @screen_line
+
+   lda #$02
+   sta VBLANK
+
+; 30 lines overscan
+   ldx #30
+@oscan_loop:
+   sta WSYNC
+   dex
+   bne @oscan_loop
+
+   jmp level2
 
 ; More graphics
 
