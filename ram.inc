@@ -25,5 +25,8 @@ SHOW_M1     = $A1
 DEAD        = $A2
 LAST        = $A3
 INDEX       = $A4
+HIDE_CAKE_12 = SHOW_BL
+HIDE_CAKE_34 = SHOW_M0
+HIDE_UMBRELLA = SHOW_M1
 
 .endif

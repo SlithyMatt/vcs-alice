@@ -30,11 +30,13 @@ Reset1:
 
    ; Graphics Data
 
-falling_sprites_1:
-   FALLING_SPRITES
-
 digits1_1:
    DIGITS_1
+
+digits02_1:
+   DIGITS_02
+
+; Pre-level 1 init
 
 start_bank1:
    lda #<falling_sprites_1
@@ -49,6 +51,9 @@ start_bank1:
    sta START
    sta COUNTER
    sta COLUBK
+   sta HIDE_CAKE_12
+   sta HIDE_CAKE_34
+   sta HIDE_UMBRELLA
    lda #$10 ; dark brown
    sta COLUPF
    lda #$66 ; purple
@@ -115,48 +120,56 @@ level2:
 
    lda #$FF
    sta INDEX
+   bit HIDE_CAKE_12
+   bmi @check_bonus_2
    lda COUNTER
    cmp #0
    bne @check_bonus_1
    lda OFFSET
    cmp #13
-   bmi @no_bonus_0
+   bmi @no_bonus
    jmp @p1_set_right
-@no_bonus_0:
-   sta WSYNC
-   jmp @p1_set
 @check_bonus_1:
    lda COUNTER
    cmp #1
    bne @check_bonus_2
    lda OFFSET
    cmp #13
-   bpl @no_bonus_1
+   bpl @no_bonus
    jmp @p1_set_right
-@no_bonus_1:
-   sta WSYNC
-   jmp @p1_set
 @check_bonus_2:
+   bit HIDE_CAKE_12
+   bvs @check_counter_3
    lda COUNTER
    cmp #2
    bne @check_counter_3
    lda OFFSET
    cmp #5
-   bpl @p1_set_left
-   sta WSYNC
-   jmp @p1_set
+   bmi @no_bonus
+   jmp @p1_set_left
 @check_counter_3:
    lda COUNTER
    cmp #3
    bne @check_bonus_3
+   bit HIDE_CAKE_12
+   bvs @no_bonus_2
    lda OFFSET
    cmp #5
-   bmi @p1_set_left
-   cmp #13
-   bpl @p1_set_right
+   bpl @no_bonus
+   jmp @p1_set_left
+@no_bonus:
    sta WSYNC
    jmp @p1_set
+@no_bonus_2:
+   bit HIDE_CAKE_34
+   bmi @no_bonus
+   lda OFFSET
+   cmp #13
+   bmi @no_bonus
+   jmp @p1_set_right
 @check_bonus_3:
+   bit HIDE_CAKE_34
+   bmi @check_bonus_4
    lda COUNTER
    cmp #4
    bne @check_bonus_4
@@ -166,6 +179,8 @@ level2:
    sta WSYNC
    jmp @p1_set
 @check_bonus_4:
+   bit HIDE_CAKE_34
+   bvs @check_umbrella
    lda COUNTER
    cmp #5
    bne @check_counter_6
@@ -175,9 +190,16 @@ level2:
    sta WSYNC
    jmp @p1_set
 @check_counter_6:
+   lda COUNTER
+   cmp #6
+   bne @no_bonus
    lda OFFSET
    cmp #5
    bmi @p1_set_left
+@check_umbrella:
+   bit HIDE_UMBRELLA
+   bmi @p1_set
+   lda OFFSET
    cmp #22
    bpl @set_umbrella
    sta WSYNC
@@ -313,6 +335,7 @@ level2:
    sta PF1
    lda PF2_R
    sta PF2
+   dey
    cpx INDEX
    bne @top8_no_p1
    lda (PTR2),y
@@ -325,14 +348,13 @@ level2:
    nop
    nop
    nop
-   nop
    lda PF1_R
    eor #$ff
    sta PF1
    lda PF2_R
    eor #$0f
    sta PF2
-   dey
+   cpy #0
    bne @top8
    LEVEL1_LOOP_INC_OFFSET
    sta PF2_R
@@ -352,13 +374,13 @@ level2:
    iny
    lda (PTR1),y
    sta GRP0
-   iny
    lda PF1_R
    eor #$ff
    sta PF1
    lda PF2_R
    eor #$0f
    sta PF2
+   iny
 
    ; Lines 8-15: playfield + upper sprite
 @start_alice:
@@ -533,7 +555,7 @@ level2:
    sta VBLANK                     ; end of screen - enter blanking
 
 ; 30 scanlines of overscan...
-   ldx #28
+   ldx #27
 @oscan_loop:
    sta WSYNC
    dex
@@ -550,13 +572,51 @@ level2:
    sta SCORE_10K
    sta WSYNC
    sta WSYNC
+   sta WSYNC
    jmp start_bank1
 @check_pf:
    sta WSYNC
    bit CXP0FB
-   bpl @continue_level2
+   bpl @check_p1
    lda #$80
    sta DEAD
+   sta WSYNC
+   jmp @continue_level2
+@check_p1:
+   bit CXPPMM
+   bpl @continue_level2
+   ADD_SCORE 25
+   sta WSYNC
+   lda OFFSET
+   cmp #10
+   bmi @take_left_cake
+   cmp #41
+   bpl @take_umbrella
+   lda COUNTER
+   cmp #1
+   beq @take_cake_1
+   lda #$80
+   sta HIDE_CAKE_34
+   jmp @continue_level2
+@take_cake_1:
+   lda #$80
+   sta HIDE_CAKE_12
+   jmp @continue_level2
+@take_left_cake:
+   lda COUNTER
+   cmp #3
+   beq @take_cake_2
+   lda #$C0
+   sta HIDE_CAKE_34
+   jmp @continue_level2
+@take_cake_2:
+   lda #$C0
+   sta HIDE_CAKE_12
+   jmp @continue_level2
+@take_umbrella:
+   ADD_SCORE 175
+   lda #$80
+   sta HIDE_UMBRELLA
 @continue_level2:
    sta WSYNC
    sta CXCLR
@@ -568,6 +628,7 @@ level2:
    sta PF1
    lda PF2_R
    sta PF2
+   dey
    clc
    lda OFFSET
    adc #22
@@ -582,14 +643,13 @@ level2:
    sta GRP1
 @top8_bottom_p1_set:
    nop
-   nop
    lda PF1_R
    eor #$ff
    sta PF1
    lda PF2_R
    eor #$0f
    sta PF2
-   dey
+   cpy #0
    bne @top8_bottom
    inx
    lda #0
@@ -600,8 +660,8 @@ level2:
    rol PF2_R
    sec
    ror
-   sta PF1_R
    sta PF1
+   sta PF1_R
    rol PF2_R
    lda PF2_R
    sta PF2
@@ -610,13 +670,13 @@ level2:
    iny
    lda (PTR1),y
    sta GRP0
-   iny
    lda PF1_R
    eor #$ff
    sta PF1
    lda PF2_R
    eor #$0f
    sta PF2
+   iny
 
    ; Lines 8-15: playfield + upper sprite
 @start_alice_bottom:
@@ -884,42 +944,10 @@ level2:
 
 ; More graphics
 
+falling_sprites_1:
+   FALLING_SPRITES
 
-
-level2_cake_up:
-.byte $D8
-.byte $D8
-.byte 0
-.byte 0
-.byte $D8
-.byte $D8
-.byte $20
-.byte 0
-
-level2_cake_down:
-.repeat 2
-.byte 0,0
-.byte $20,0
-.byte $D8,0
-.byte $D8,0
-.byte 0,0
-.byte 0,0
-.byte $D8,0
-.byte $D8,0
-.endrepeat
-
-level2_umbrella_up:
-.byte $0C
-.byte $08
-.byte $08
-.byte $08
-.byte $2A
-.byte $1C
-.byte $08
-.byte 0
-
-digits02_1:
-   DIGITS_02
+.res 13 ; filler
 
 level1_terrain:
 .byte $F0
@@ -998,7 +1026,37 @@ level1_terrain:
 .byte $F8
 
 
+level2_cake_up:
+.byte $D8
+.byte $D8
+.byte 0
+.byte 0
+.byte $D8
+.byte $D8
+.byte $20
+.byte 0
 
+level2_cake_down:
+.repeat 2
+.byte 0,0
+.byte $20,0
+.byte $D8,0
+.byte $D8,0
+.byte 0,0
+.byte 0,0
+.byte $D8,0
+.byte $D8,0
+.endrepeat
+
+level2_umbrella_up:
+.byte $0C
+.byte $08
+.byte $08
+.byte $08
+.byte $2A
+.byte $1C
+.byte $08
+.byte 0
 
 level2_umbrella_down:
 .repeat 2
