@@ -54,6 +54,8 @@ start_bank1:
    sta HIDE_CAKE_12
    sta HIDE_CAKE_34
    sta HIDE_UMBRELLA
+   lda #8
+   sta LINE
    lda #$10 ; dark brown
    sta COLUPF
    lda #$66 ; purple
@@ -956,24 +958,78 @@ end_level2:
 
 ; 37 scanlines of vertical blank...
 
-   ldx #36
+   ldx #35
 @vblank_loop:
    sta WSYNC
    dex
    bne @vblank_loop
-
-   ldx #60
-
+   inc LINE
+   lda #<falling_sprites_1
+   sta PTR1
+   lda #>falling_sprites_1
+   sta PTR1+1
+   bit HIDE_UMBRELLA
+   bpl @fall
+   clc
+   lda PTR1
+   adc #64
+   sta PTR1
+   lda PTR1+1
+   adc #0
+   sta PTR1+1
+   jmp @check_bottom
+@fall:
+   inc LINE
+@check_bottom:
+   sta WSYNC
+   bit HIDE_UMBRELLA
+   bpl @check_death
+   lda LINE
+   cmp #137
+   bmi @start_terrain
+   dec LINE
+   lda #$07
+   bit FRAME_CTR
+   bne @set_side_sprite
+   lda #$F0
+   sta HMP0
+@set_side_sprite:
+   lda #<side_sprites_1
+   sta PTR1
+   lda #>side_sprites_1
+   sta PTR1+1
+   lda #$08
+   bit FRAME_CTR
+   beq @start_terrain
+   clc
+   lda PTR1
+   adc #48
+   sta PTR1
+   lda PTR1+1
+   adc #0
+   sta PTR1+1
+   jmp @start_terrain
+@check_death:
+   lda LINE
+   cmp #145
+   bmi @start_terrain
+   dec LINE
+   lda #$80
+   sta DEAD
+@start_terrain:
+   ldx #0
 @above_alice:
    sta WSYNC
 
 ; TODO screen lines
-   ldx #192
+   ldx #191
 @screen_line:
    sta WSYNC
    dex
    bne @screen_line
 
+
+   sta WSYNC
    lda #$02
    sta VBLANK
 
@@ -1069,6 +1125,26 @@ level1_terrain:
 .byte $F0
 .byte $F8
 
+level2_end_pf:
+.byte $FF,$00,$00,$0F
+.byte $FE,$00,$01,$0F
+.byte $FE,$00,$01,$0F
+.byte $FE,$00,$01,$0F
+.byte $FC,$00,$03,$0F
+.byte $FC,$00,$03,$0F
+.byte $FC,$00,$03,$0F
+.byte $FC,$00,$03,$0F
+.byte $FC,$00,$03,$0F
+.byte $FC,$00,$03,$0F
+.byte $FC,$00,$03,$0F
+.byte $FC,$00,$03,$0F
+.byte $FC,$00,$03,$0F
+.byte $FE,$00,$01,$0F
+.byte $FF,$00,$00,$00
+.byte $FF,$00,$00,$00
+.byte $FF,$00,$00,$00
+.byte $FF,$00,$00,$00
+.byte $FF,$00,$00,$00
 
 level2_cake_up:
 .byte $D8
@@ -1114,6 +1190,8 @@ level2_umbrella_down:
 .byte $0C,0
 .endrepeat
 
+side_sprites_1:
+SIDE_SPRITES
 
 .org $3FFA
 .segment "VECTORS1"

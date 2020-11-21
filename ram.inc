@@ -28,5 +28,6 @@ INDEX       = $A4
 HIDE_CAKE_12 = SHOW_BL
 HIDE_CAKE_34 = SHOW_M0
 HIDE_UMBRELLA = SHOW_M1
+LINE        = $A5
 
 .endif
