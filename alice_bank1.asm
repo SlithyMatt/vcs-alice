@@ -986,7 +986,7 @@ end_level2:
    bpl @check_death
    lda LINE
    cmp #137
-   bmi @start_terrain
+   bmi @score
    dec LINE
    lda #$07
    bit FRAME_CTR
@@ -1000,7 +1000,7 @@ end_level2:
    sta PTR1+1
    lda #$08
    bit FRAME_CTR
-   beq @start_terrain
+   beq @score
    clc
    lda PTR1
    adc #48
@@ -1008,26 +1008,125 @@ end_level2:
    lda PTR1+1
    adc #0
    sta PTR1+1
-   jmp @start_terrain
+   jmp @score
 @check_death:
    lda LINE
    cmp #145
-   bmi @start_terrain
+   bmi @score
    dec LINE
    lda #$80
    sta DEAD
-@start_terrain:
+
+@score:
+   SCORE digits1_1, digits02_1
+   lda #$10 ; dark brown
+   sta COLUPF
+
    ldx #0
+   stx INDEX
 @above_alice:
    sta WSYNC
+   lda level2_end_pf,x
+   sta PF1
+   lda level2_end_pf+1,x
+   sta PF2
+   inc INDEX
+   ldy #2
+:  dey
+   bne :-
+   lda level2_end_pf+2,x
+   sta PF1
+   lda level2_end_pf+3,x
+   sta PF2
+   lda INDEX
+   cmp LINE
+   beq @start_alice
+   lda #$07
+   bit INDEX
+   bne @above_alice
+   clc
+   txa
+   adc #4
+   tax
+   jmp @above_alice
 
-; TODO screen lines
-   ldx #191
-@screen_line:
+@start_alice:
+   ldy #0
+@alice_falling:
    sta WSYNC
-   dex
-   bne @screen_line
+   lda level2_end_pf,x
+   sta PF1
+   lda level2_end_pf+1,x
+   sta PF2
+   lda (PTR1),y
+   sta COLUP0
+   iny
+   lda (PTR1),y
+   sta GRP0
+   iny
+   inc INDEX
+   lda level2_end_pf+2,x
+   sta PF1
+   lda level2_end_pf+3,x
+   sta PF2
+   lda INDEX
+   cmp #152
+   beq @floor
+   cpy #32
+   beq @below_alice
+   lda #$07
+   bit INDEX
+   bne @alice_falling
+   clc
+   txa
+   adc #4
+   tax
+   jmp @alice_falling
 
+@below_alice:
+   sta WSYNC
+   lda level2_end_pf,x
+   sta PF1
+   lda level2_end_pf+1,x
+   sta PF2
+   inc INDEX
+   lda #0
+   sta GRP0
+   ldy #2
+:  dey
+   bne :-
+   lda level2_end_pf+2,x
+   sta PF1
+   lda level2_end_pf+3,x
+   sta PF2
+   lda INDEX
+   cmp #152
+   beq @floor
+   lda #$07
+   bit INDEX
+   bne @below_alice
+   clc
+   txa
+   adc #4
+   tax
+   jmp @below_alice
+
+@start_floor:
+   ldx #0
+@floor:
+   sta WSYNC
+   lda #0
+   sta PF0
+   lda #$FF
+   sta PF1
+   sta PF2
+   ldy #2
+:  dey
+   bne :-
+   sta PF0
+   inx
+   cpx #24
+   bne @floor
 
    sta WSYNC
    lda #$02
