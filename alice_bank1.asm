@@ -56,6 +56,8 @@ start_bank1:
    sta HIDE_UMBRELLA
    lda #8
    sta LINE
+   lda #32
+   sta HEIGHT
    lda #$10 ; dark brown
    sta COLUPF
    lda #$66 ; purple
@@ -985,7 +987,7 @@ end_level2:
    bit HIDE_UMBRELLA
    bpl @check_death
    lda LINE
-   cmp #137
+   cmp #129
    bmi @score
    dec LINE
    lda #$07
@@ -998,6 +1000,8 @@ end_level2:
    sta PTR1
    lda #>side_sprites_1
    sta PTR1+1
+   lda #48
+   sta HEIGHT
    lda #$08
    bit FRAME_CTR
    beq @score
@@ -1018,6 +1022,8 @@ end_level2:
    sta DEAD
 
 @score:
+   sta WSYNC
+   sta HMOVE
    SCORE digits1_1, digits02_1
    lda #$10 ; dark brown
    sta COLUPF
@@ -1026,92 +1032,84 @@ end_level2:
    stx INDEX
 @above_alice:
    sta WSYNC
-   lda level2_end_pf,x
+   lda #$FF
    sta PF1
-   lda level2_end_pf+1,x
+   lda #0
    sta PF2
    inc INDEX
-   ldy #2
+   ldy #3
 :  dey
    bne :-
-   lda level2_end_pf+2,x
+   nop
+   lda #0
    sta PF1
-   lda level2_end_pf+3,x
+   lda INDEX
+   cmp #112
+   bpl @check_start_alice
+   lda #$0F
    sta PF2
+@check_start_alice:
    lda INDEX
    cmp LINE
    beq @start_alice
-   lda #$07
-   bit INDEX
-   bne @above_alice
-   clc
-   txa
-   adc #4
-   tax
    jmp @above_alice
 
 @start_alice:
    ldy #0
 @alice_falling:
    sta WSYNC
-   lda level2_end_pf,x
+   lda #$FF
    sta PF1
-   lda level2_end_pf+1,x
+   lda #0
    sta PF2
    lda (PTR1),y
    sta COLUP0
    iny
    lda (PTR1),y
    sta GRP0
-   iny
    inc INDEX
-   lda level2_end_pf+2,x
+   iny
+   lda #0
    sta PF1
-   lda level2_end_pf+3,x
-   sta PF2
    lda INDEX
+   cmp #112
+   bpl @check_alice_floor
+   lda #$0F
+   sta PF2
+@check_alice_floor:
    cmp #152
-   beq @floor
-   cpy #32
+   beq @start_floor
+   cpy HEIGHT
    beq @below_alice
-   lda #$07
-   bit INDEX
-   bne @alice_falling
-   clc
-   txa
-   adc #4
-   tax
    jmp @alice_falling
 
 @below_alice:
    sta WSYNC
-   lda level2_end_pf,x
+   lda #$FF
    sta PF1
-   lda level2_end_pf+1,x
+   lda #0
    sta PF2
    inc INDEX
    lda #0
    sta GRP0
-   ldy #2
+   ldy #3
 :  dey
    bne :-
-   lda level2_end_pf+2,x
+   lda #0
    sta PF1
-   lda level2_end_pf+3,x
-   sta PF2
    lda INDEX
+   cmp #112
+   bpl @check_floor
+   lda #$0F
+   sta PF2
+@check_floor:
    cmp #152
-   beq @floor
-   lda #$07
-   bit INDEX
-   bne @below_alice
-   clc
-   txa
-   adc #4
-   tax
+   beq @start_floor
    jmp @below_alice
 
 @start_floor:
+   lda #0
+   sta GRP0
    ldx #0
 @floor:
    sta WSYNC
@@ -1133,20 +1131,29 @@ end_level2:
    sta VBLANK
 
 ; 30 lines overscan
-   ldx #30
+   ldx #29
 @oscan_loop:
    sta WSYNC
    dex
    bne @oscan_loop
 
+   bit DEAD
+   bpl @finish_oscan
+   bit INPT4
+   bmi @finish_oscan
+   lda #0
+   sta DEAD
+   sta SCORE_1
+   sta SCORE_100
+   sta SCORE_10K
+   sta WSYNC
+   jmp start_bank1
+
+@finish_oscan:
+   sta WSYNC
    jmp level2
 
 ; More graphics
-
-falling_sprites_1:
-   FALLING_SPRITES
-
-.res 13 ; filler
 
 level1_terrain:
 .byte $F0
@@ -1210,40 +1217,19 @@ level1_terrain:
 .byte $FC
 .byte $FC
 .byte $FC
-.byte $F8
-.byte $F8
-.byte $F8
-.byte $F0
-.byte $F0
-.byte $F0
-.byte $F0
-.byte $F0
-.byte $F0
-.byte $F0
-.byte $F0
-.byte $F0
-.byte $F8
-
-level2_end_pf:
-.byte $FF,$00,$00,$0F
-.byte $FE,$00,$01,$0F
-.byte $FE,$00,$01,$0F
-.byte $FE,$00,$01,$0F
-.byte $FC,$00,$03,$0F
-.byte $FC,$00,$03,$0F
-.byte $FC,$00,$03,$0F
-.byte $FC,$00,$03,$0F
-.byte $FC,$00,$03,$0F
-.byte $FC,$00,$03,$0F
-.byte $FC,$00,$03,$0F
-.byte $FC,$00,$03,$0F
-.byte $FC,$00,$03,$0F
-.byte $FE,$00,$01,$0F
-.byte $FF,$00,$00,$00
-.byte $FF,$00,$00,$00
-.byte $FF,$00,$00,$00
-.byte $FF,$00,$00,$00
-.byte $FF,$00,$00,$00
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $FC
+.byte $FC
 
 level2_cake_up:
 .byte $D8
@@ -1254,6 +1240,8 @@ level2_cake_up:
 .byte $D8
 .byte $20
 .byte 0
+
+.res 16 ; filler
 
 level2_cake_down:
 .repeat 2
@@ -1288,6 +1276,11 @@ level2_umbrella_down:
 .byte $08,0
 .byte $0C,0
 .endrepeat
+
+falling_sprites_1:
+FALLING_SPRITES
+
+.res 88 ; filler
 
 side_sprites_1:
 SIDE_SPRITES
