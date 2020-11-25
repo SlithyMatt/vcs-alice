@@ -541,8 +541,7 @@ DIGITS_02
 .word Reset          ; IRQ
 
 .include "alice_bank1.asm"
-.segment "BANK2"
-.segment "VECTORS2"
+.include "alice_bank2.asm"
 .segment "BANK3"
 .segment "VECTORS3"
 .segment "BANK4"

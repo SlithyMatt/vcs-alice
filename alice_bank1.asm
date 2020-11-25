@@ -26,6 +26,7 @@ Reset1:
    nop
    ; Bank 1 entry:
    jmp start_bank1
+jump_b1b2:
    bit BANK2
 
    ; Graphics Data
@@ -123,7 +124,7 @@ level2:
 
 ; 37 scanlines of vertical blank...
 
-   ldx #31
+   ldx #30
 @vblank_loop:
    sta WSYNC
    dex
@@ -170,6 +171,7 @@ level2:
    jmp @p1_set_left
 @no_bonus:
    sta WSYNC
+   sta WSYNC
    jmp @p1_set
 @no_bonus_2:
    bit HIDE_CAKE_34
@@ -187,8 +189,7 @@ level2:
    lda OFFSET
    cmp #13
    bmi @p1_set_right
-   sta WSYNC
-   jmp @p1_set
+   jmp @no_bonus
 @check_bonus_4:
    bit HIDE_CAKE_34
    bvs @check_umbrella
@@ -198,8 +199,7 @@ level2:
    lda OFFSET
    cmp #5
    bpl @p1_set_left
-   sta WSYNC
-   jmp @p1_set
+   jmp @no_bonus
 @check_counter_6:
    lda COUNTER
    cmp #6
@@ -213,8 +213,7 @@ level2:
    lda OFFSET
    cmp #22
    bpl @set_umbrella
-   sta WSYNC
-   jmp @p1_set
+   jmp @no_bonus
 @set_umbrella:
    lda #$1C
    sta COLUP1
@@ -249,6 +248,7 @@ level2:
 :  dex
    bne :-
    sta RESP1
+   sta WSYNC
    jmp @set_cake_ptr
 @p1_set_right:
    lda #12
@@ -260,6 +260,7 @@ level2:
    nop
    nop
    sta RESP1
+   sta WSYNC
 @set_cake_ptr:
    lda INDEX
    sec
@@ -1015,8 +1016,9 @@ end_level2:
    jmp @score
 @check_death:
    lda LINE
-   cmp #145
-   bmi @score
+   cmp #146
+   bne @score
+   dec LINE
    dec LINE
    lda #$80
    sta DEAD
@@ -1027,6 +1029,14 @@ end_level2:
    SCORE digits1_1, digits02_1
    lda #$10 ; dark brown
    sta COLUPF
+   lda #$00 ; black
+   sta COLUP1
+   lda #$80
+   sta GRP1
+   ldx #10
+:  dex
+   bne :-
+   sta RESP1
 
    ldx #0
    stx INDEX
@@ -1108,9 +1118,9 @@ end_level2:
    jmp @below_alice
 
 @start_floor:
-   lda #0
-   sta GRP0
    ldx #0
+   stx GRP0
+   stx GRP1
 @floor:
    sta WSYNC
    lda #0
@@ -1137,6 +1147,12 @@ end_level2:
    dex
    bne @oscan_loop
 
+   bit CXPPMM
+   bpl @check_continue
+   sta CXCLR
+   ADD_SCORE 200
+   jmp jump_b1b2
+@check_continue:
    bit DEAD
    bpl @finish_oscan
    bit INPT4
@@ -1241,7 +1257,6 @@ level2_cake_up:
 .byte $20
 .byte 0
 
-.res 16 ; filler
 
 level2_cake_down:
 .repeat 2
