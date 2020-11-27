@@ -18,6 +18,7 @@ jump_b0b1:
    bit BANK1
 
 start:
+   cld
    ldx #0
    lda #0
 Clear:
