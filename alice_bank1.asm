@@ -14,6 +14,21 @@
 :  lda #0
 .endmacro
 
+.macro SET_RABBIT_HOLE_PF_GRAPHICS   
+   sta PF2_R
+   lda level1_terrain,x
+   sec
+   ror
+   rol PF2_R
+   sec
+   ror
+   sta PF1
+   sta PF1_R
+   rol PF2_R
+   lda PF2_R
+   sta PF2
+.endmacro
+
 .org $3000
 .segment "BANK1"
 Reset1:
@@ -314,8 +329,8 @@ level2:
    adc #0
    sta PTR1+1
 @alice_frame_set:
-   sta WSYNC
    lda #0
+   sta WSYNC
    sta PF2_R
    ldx OFFSET
    lda level1_terrain,x
@@ -369,18 +384,7 @@ level2:
    cpy #0
    bne @top8
    LEVEL1_LOOP_INC_OFFSET
-   sta PF2_R
-   lda level1_terrain,x
-   sec
-   ror
-   rol PF2_R
-   sec
-   ror
-   sta PF1_R
-   sta PF1
-   rol PF2_R
-   lda PF2_R
-   sta PF2
+   SET_RABBIT_HOLE_PF_GRAPHICS
    lda (PTR1),y
    sta COLUP0
    iny
@@ -424,18 +428,7 @@ level2:
    cpy #16
    bne @start_alice
    LEVEL1_LOOP_INC_OFFSET
-   sta PF2_R
-   lda level1_terrain,x
-   sec
-   ror
-   rol PF2_R
-   sec
-   ror
-   sta PF1
-   sta PF1_R
-   rol PF2_R
-   lda PF2_R
-   sta PF2
+   SET_RABBIT_HOLE_PF_GRAPHICS
    iny
    lda (PTR1),y
    sta GRP0
@@ -477,18 +470,7 @@ level2:
    cpy #32
    bne @start_lower_alice
    LEVEL1_LOOP_INC_OFFSET
-   sta PF2_R
-   lda level1_terrain,x
-   sec
-   ror
-   rol PF2_R
-   sec
-   ror
-   sta PF1_R
-   sta PF1
-   rol PF2_R
-   lda PF2_R
-   sta PF2
+   SET_RABBIT_HOLE_PF_GRAPHICS
    lda #0
    sta GRP0
    nop
@@ -535,18 +517,7 @@ level2:
    LEVEL1_LOOP_INC_OFFSET
    cpx OFFSET
    beq @end_screen
-   sta PF2_R
-   lda level1_terrain,x
-   sec
-   ror
-   rol PF2_R
-   sec
-   ror
-   sta PF1_R
-   sta PF1
-   rol PF2_R
-   lda PF2_R
-   sta PF2
+   SET_RABBIT_HOLE_PF_GRAPHICS
    nop
    nop
    nop
@@ -665,18 +636,7 @@ level2:
    bne @top8_bottom
    inx
    lda #0
-   sta PF2_R
-   lda level1_terrain,x
-   sec
-   ror
-   rol PF2_R
-   sec
-   ror
-   sta PF1
-   sta PF1_R
-   rol PF2_R
-   lda PF2_R
-   sta PF2
+   SET_RABBIT_HOLE_PF_GRAPHICS
    lda (PTR1),y
    sta COLUP0
    iny
@@ -721,18 +681,7 @@ level2:
    bne @start_alice_bottom
    inx
    lda #0
-   sta PF2_R
-   lda level1_terrain,x
-   sec
-   ror
-   rol PF2_R
-   sec
-   ror
-   sta PF1
-   sta PF1_R
-   rol PF2_R
-   lda PF2_R
-   sta PF2
+   SET_RABBIT_HOLE_PF_GRAPHICS
    iny
    lda (PTR1),y
    sta GRP0
@@ -775,18 +724,7 @@ level2:
    bne @start_lower_alice_bottom
    inx
    lda #0
-   sta PF2_R
-   lda level1_terrain,x
-   sec
-   ror
-   rol PF2_R
-   sec
-   ror
-   sta PF1_R
-   sta PF1
-   rol PF2_R
-   lda PF2_R
-   sta PF2
+   SET_RABBIT_HOLE_PF_GRAPHICS
    lda #0
    sta GRP0
    nop
@@ -832,18 +770,7 @@ level2:
    cpx LAST
    beq @end_screen_bottom
    lda #0
-   sta PF2_R
-   lda level1_terrain,x
-   sec
-   ror
-   rol PF2_R
-   sec
-   ror
-   sta PF1_R
-   sta PF1
-   rol PF2_R
-   lda PF2_R
-   sta PF2
+   SET_RABBIT_HOLE_PF_GRAPHICS
    nop
    nop
    nop
