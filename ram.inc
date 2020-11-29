@@ -30,5 +30,7 @@ HIDE_CAKE_34 = SHOW_M0
 HIDE_UMBRELLA = SHOW_M1
 LINE        = $A5
 HEIGHT      = $A6
+MUSIC_PTR   = $A7 ; music pointer address
+MUSIC_CTR   = $A9
 
 .endif

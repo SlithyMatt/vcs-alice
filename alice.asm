@@ -4,9 +4,12 @@
 .include "sprites.inc"
 .include "playfield.inc"
 .include "score.inc"
+.include "music.inc"
 
 ; Constants
 
+SET_MUSIC_TEMPO 100
+SET_MUSIC_VOLUME 6
 
 .org $1000
 .segment "STARTUP"
@@ -175,9 +178,12 @@ StartOfFrame:
    bne @oscan_loop
 
    bit INPT4
-   bpl level1
+   bpl init_level1
 
    jmp StartOfFrame
+
+init_level1:
+   INIT_MUSIC level1_music
 
 ; Level 1: Above ground, chasing white rabbit
 level1:
@@ -280,10 +286,11 @@ level1:
    sta HMP0
 @alice_movement_set:
    sta WSYNC
+   PLAY_MUSIC
    sta WSYNC
    sta HMOVE
    sta WSYNC
-   ldx #32
+   ldx #30
 @vblank_loop:
    sta WSYNC
    dex
@@ -524,6 +531,54 @@ SIDE_SPRITES
 
 rabbit_sprites_0:
 WHITE_RABBIT_SPRITES
+
+; Music
+level1_music:
+D_SHARP5 EIGHTH
+D5 EIGHTH
+D_SHARP5 EIGHTH
+A_SHARP4 D_QUARTER
+G4 D_QUARTER
+F4 EIGHTH
+E4 EIGHTH
+F4 EIGHTH
+C5 D_HALF
+A_SHARP4 EIGHTH
+D5 EIGHTH
+C5 (EIGHTH - 5)
+REST 5
+C5 EIGHTH
+A_SHARP4 EIGHTH
+G_SHARP4 (EIGHTH - 5)
+REST 5
+G_SHARP4 EIGHTH
+G4 EIGHTH
+F4 EIGHTH
+G4 HALF
+REST EIGHTH
+D_SHARP5 EIGHTH
+D5 EIGHTH
+D_SHARP5 EIGHTH
+A_SHARP4 D_QUARTER
+G4 D_QUARTER
+F4 EIGHTH
+E4 EIGHTH
+F4 EIGHTH
+C5 D_HALF
+A_SHARP4 EIGHTH
+D5 EIGHTH
+C5 (EIGHTH - 5)
+REST 5
+C5 EIGHTH
+A_SHARP4 EIGHTH
+G_SHARP4 (EIGHTH - 5)
+REST 5
+G_SHARP4 EIGHTH
+G4 EIGHTH
+F4 EIGHTH
+D_SHARP4 HALF
+REST EIGHTH
+END_MUSIC level1_music
 
 ; Score digits
 .org $1F5A
