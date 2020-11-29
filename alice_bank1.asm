@@ -14,7 +14,7 @@
 :  lda #0
 .endmacro
 
-.macro SET_RABBIT_HOLE_PF_GRAPHICS   
+.macro SET_RABBIT_HOLE_PF_GRAPHICS
    sta PF2_R
    lda level1_terrain,x
    sec
@@ -78,6 +78,7 @@ start_bank1:
    sta COLUPF
    lda #$66 ; purple
    sta COLUP1
+   INIT_MUSIC level2_falling_music
 
 level2:
 
@@ -139,11 +140,13 @@ level2:
 
 ; 37 scanlines of vertical blank...
 
-   ldx #30
+   ldx #28
 @vblank_loop:
    sta WSYNC
    dex
    bne @vblank_loop
+
+   PLAY_MUSIC
 
    lda #$FF
    sta INDEX
@@ -1221,6 +1224,24 @@ level2_umbrella_down:
 
 falling_sprites_1:
 FALLING_SPRITES
+
+; Music
+
+level2_falling_music:
+C6 EIGHTH
+B5 EIGHTH
+A5 EIGHTH
+G5 EIGHTH
+A5 EIGHTH
+G5 EIGHTH
+F5 EIGHTH
+E5 EIGHTH
+F5 EIGHTH
+E5 EIGHTH
+D5 EIGHTH
+C5 EIGHTH
+D6 EIGHTH
+END_MUSIC level2_falling_music
 
 .res 88 ; filler
 
