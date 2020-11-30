@@ -5,6 +5,7 @@
 .include "playfield.inc"
 .include "score.inc"
 .include "music.inc"
+.include "sfx.inc"
 
 ; Constants
 
@@ -42,6 +43,9 @@ Clear:
    sta SHOW_BL
    sta SHOW_M0
    sta SHOW_M1
+
+   ; Initialize SFX
+   START_SFX level1_stop_sfx
 
 StartOfFrame:
 
@@ -201,6 +205,7 @@ level1:
    beq @check_jump
    dec JUMP_CD
 @jump:
+   START_SFX level1_jump_sfx
    lda #96
    sta OFFSET
    jmp @alice_frame_set
@@ -317,10 +322,8 @@ level1:
    PFLINE 1,0,$1F,$1F
    PFLINE 1,0,$0F,$0B
    PFLINE 1,0,$1F,$1F
-   PFLINE 1,0,$17,$1F
-   PFLINE 1,0,$3F,$37
-   PFLINE 1,0,$2F,$2F
-   PFLINE 1,0,$3F,$3F
+   PFLINE 1,0,$17,$17
+   PFLINE 3,0,$3F,$3F
    PFLINE 1,0,$1F,$1F
    PFLINE 2,0,$3F,$3F
    PFLINE 1,0,$5F,$7F
@@ -329,9 +332,8 @@ level1:
    PFLINE 1,0,$3F,$3F
    PFLINE 1,0,$7F,$7F
    PFLINE 1,0,$5F,$3F
-   PFLINE 1,0,$7F,$5F
-   PFLINE 1,0,$7F,$3F
-   PFLINE 1,0,$3F,$7F
+   PFLINE 2,0,$7F,$7F
+   PFLINE 1,0,$3F,$5F
    PFLINE 1,0,$7F,$7F
    PFLINE 1,0,$BF,$3F
    PFLINE 1,0,$5F,$7F
@@ -344,8 +346,7 @@ level1:
    PFLINE 1,0,$FF,$3F
    PFLINE 1,0,$5F,$DF
    PFLINE 1,0,$BF,$7F
-   PFLINE 1,0,$7F,$3F
-   PFLINE 1,0,$5F,$FF
+   PFLINE 2,0,$7F,$FF
    PFLINE 1,0,$BF,$5F
    PFLINE 1,0,$57,$AB
    lda #$14 ; medium brown
@@ -487,7 +488,7 @@ level1:
    sta COLUBK
 
    ; 30 scanlines of overscan...
-   ldx #26
+   ldx #24
 @oscan_loop:
    sta WSYNC
    dex
@@ -502,6 +503,7 @@ level1:
    sta WSYNC
    bit CXM0P
    bvc @check_m1
+   START_SFX level1_bonus_sfx
    lda #0
    sta SHOW_M0
    ADD_SCORE 10
@@ -509,6 +511,7 @@ level1:
    sta WSYNC
    bit CXM1P
    bpl @check_ball
+   START_SFX level1_bonus_sfx
    lda #0
    sta SHOW_M1
    ADD_SCORE 10
@@ -516,11 +519,13 @@ level1:
    sta WSYNC
    bit CXP0FB
    bvc @continue_level1
+   START_SFX level1_bonus_sfx
    lda #0
    sta SHOW_BL
    ADD_SCORE 10
 @continue_level1:
    sta WSYNC
+   PLAY_SFX
    sta CXCLR
    jmp level1
 
@@ -579,6 +584,20 @@ F4 EIGHTH
 D_SHARP4 HALF
 REST EIGHTH
 END_MUSIC level1_music
+
+; Sound Effects
+level1_stop_sfx:
+STOP_SFX
+
+level1_jump_sfx:
+.byte 14,4,9,5
+.byte 13,4,9,3
+.byte 12,4,9,4
+END_SFX
+
+level1_bonus_sfx:
+.byte 10,4,10,5
+END_SFX
 
 ; Score digits
 .org $1F5A

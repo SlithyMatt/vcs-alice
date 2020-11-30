@@ -37,7 +37,6 @@ MUSIC_VOLUME = volume
 .macro PLAY_MUSIC
    ldy #0
    dec MUSIC_CTR
-   lda MUSIC_CTR
    beq :+
    sta WSYNC
    jmp :+++
