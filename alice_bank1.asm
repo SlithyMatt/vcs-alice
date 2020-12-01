@@ -79,6 +79,7 @@ start_bank1:
    lda #$66 ; purple
    sta COLUP1
    INIT_MUSIC level2_falling_music
+   START_SFX level2_stop_sfx
 
 level2:
 
@@ -146,7 +147,7 @@ level2:
    dex
    bne @vblank_loop
 
-   PLAY_MUSIC
+   PLAY_MUSIC ; 2 lines
 
    lda #$FF
    sta INDEX
@@ -541,11 +542,13 @@ level2:
    sta VBLANK                     ; end of screen - enter blanking
 
 ; 30 scanlines of overscan...
-   ldx #27
+   ldx #25
 @oscan_loop:
    sta WSYNC
    dex
    bne @oscan_loop
+
+   PLAY_SFX ; 2 lines
 
    bit DEAD
    bpl @check_pf
@@ -572,6 +575,7 @@ level2:
    bit CXPPMM
    bpl @continue_level2
    ADD_SCORE 25
+   START_SFX level2_bonus_sfx
    sta WSYNC
    lda OFFSET
    cmp #10
@@ -601,6 +605,7 @@ level2:
    jmp @continue_level2
 @take_umbrella:
    ADD_SCORE 175
+   START_SFX level2_umbrella_sfx
    lda #$80
    sta HIDE_UMBRELLA
 @continue_level2:
@@ -891,11 +896,14 @@ end_level2:
 
 ; 37 scanlines of vertical blank...
 
-   ldx #35
+   ldx #33
 @vblank_loop:
    sta WSYNC
    dex
    bne @vblank_loop
+
+   PLAY_MUSIC ; 2 lines
+
    inc LINE
    lda #<falling_sprites_1
    sta PTR1
@@ -1071,11 +1079,13 @@ end_level2:
    sta VBLANK
 
 ; 30 lines overscan
-   ldx #29
+   ldx #27
 @oscan_loop:
    sta WSYNC
    dex
    bne @oscan_loop
+
+   PLAY_SFX ; 2 lines
 
    bit CXPPMM
    bpl @check_continue
@@ -1210,6 +1220,8 @@ level2_umbrella_up:
 .byte $08
 .byte 0
 
+.res 13 ; filler
+
 level2_umbrella_down:
 .repeat 2
 .byte 0,0
@@ -1243,7 +1255,21 @@ C5 EIGHTH
 D6 EIGHTH
 END_MUSIC level2_falling_music
 
-.res 88 ; filler
+; Sound Effects
+level2_stop_sfx:
+STOP_SFX
+
+level2_umbrella_sfx:
+.byte 14,4,9,5
+.byte 13,4,9,3
+.byte 12,4,9,4
+END_SFX
+
+level2_bonus_sfx:
+.byte 10,4,10,5
+END_SFX
+
+.res 46 ; filler
 
 side_sprites_1:
 SIDE_SPRITES
