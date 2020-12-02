@@ -6,42 +6,47 @@
 .include "sprites.inc"
 .include "playfield.inc"
 
-.org $5000
-.segment "BANK2"
-Reset2:
+.org $7000
+.segment "BANK3"
+Reset3:
    bit BANK0
    nop
    nop
    nop
-jump_b2_b1:
+jump_b3_b1:
    bit BANK1
    nop
    nop
    nop
+jump_b3_b2:
+   bit BANK2
    nop
    nop
    nop
-   ; Bank 2 entry:
-   jmp start_bank2
-jump_b2_b3:
-   bit BANK3
+   nop
+   nop
+   nop
+   ; Bank 3 entry:
+   jmp start_bank3
+jump_b3_b4:
+   bit BANK4
 
    ; Graphics Data
 
-digits1_2:
+digits1_3:
    DIGITS_1
 
-digits02_2:
+digits02_3:
    DIGITS_02
 
-; Pre-level 1 init
+; Pre-level b3 init
 
-start_bank2:
+start_bank3:
    lda #0
    sta FRAME_CTR
    sta AUDV0
 
-level3:
+level_b3:
 
 ; Start of vertical blank processing
    lda #0
@@ -90,12 +95,12 @@ level3:
 
 @finish_oscan:
    sta WSYNC
-   jmp level3
+   jmp level_b3
 
 ; More graphics
 
-.org $5FFA
-.segment "VECTORS2"
-.word Reset2          ; NMI
-.word Reset2          ; RESET
-.word Reset2          ; IRQ
+.org $7FFA
+.segment "VECTORS3"
+.word Reset3          ; NMI
+.word Reset3          ; RESET
+.word Reset3          ; IRQ
