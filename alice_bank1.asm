@@ -142,13 +142,16 @@ level2:
 
 ; 37 scanlines of vertical blank...
 
-   ldx #28
+   ldx #27
 @vblank_loop:
    sta WSYNC
    dex
    bne @vblank_loop
 
    PLAY_MUSIC ; 2 lines
+
+   lda #11
+   sta TIM64T
 
    lda #$FF
    sta INDEX
@@ -190,8 +193,6 @@ level2:
    bpl @no_bonus_2
    jmp @p1_set_left
 @no_bonus:
-   sta WSYNC
-   sta WSYNC
    jmp @p1_set
 @no_bonus_2:
    bit HIDE_CAKE_34
@@ -232,8 +233,7 @@ level2:
    bmi @p1_set
    lda OFFSET
    cmp #22
-   bpl @set_umbrella
-   jmp @no_bonus
+   bmi @no_bonus
 @set_umbrella:
    lda #$1C
    sta COLUP1
@@ -268,7 +268,6 @@ level2:
 :  dex
    bne :-
    sta RESP1
-   sta WSYNC
    jmp @set_cake_ptr
 @p1_set_right:
    lda #12
@@ -280,7 +279,6 @@ level2:
    nop
    nop
    sta RESP1
-   sta WSYNC
 @set_cake_ptr:
    lda INDEX
    sec
@@ -300,7 +298,6 @@ level2:
    lda #>level2_cake_down
    sta PTR2+1
 @p1_set:
-   sta WSYNC
    bit DEAD
    bmi @movement_set
 
@@ -335,7 +332,6 @@ level2:
    sta PTR1+1
 @alice_frame_set:
    lda #0
-   sta WSYNC
    sta PF2_R
    ldx OFFSET
    lda level1_terrain,x
@@ -346,7 +342,12 @@ level2:
    ror
    sta PF1_R
    rol PF2_R
+
+   ; wait for 10 lines
+:  lda INTIM
+   bne :-
    sta WSYNC
+
 
 ; 192 scanlines of picture...
 
@@ -1281,14 +1282,12 @@ G5 EIGHTH
 A5 EIGHTH
 B5 QUARTER
 C6 D_QUARTER
-REST EIGHTH
-C6 EIGHTH
-REST EIGHTH
-G5 SIXTEENTH
-F5 SIXTEENTH
-E5 SIXTEENTH
-D5 SIXTEENTH
-END_MUSIC level2_win_music
+REST SIXTEENTH
+B5 SIXTEENTH
+C6 HALF
+@silence:
+REST WHOLE
+END_MUSIC @silence
 
 level2_death_music:
 .byte 9,1,MUSIC_VOLUME,D_EIGHTH
@@ -1317,7 +1316,7 @@ level2_bonus_sfx:
 .byte 7,4,10,5
 END_SFX
 
-.res 28 ; filler
+.res 45 ; filler
 
 side_sprites_1:
 SIDE_SPRITES
