@@ -36,6 +36,7 @@ digits02_2:
 start_bank2:
    lda #0
    sta FRAME_CTR
+   sta AUDV0
 
 level3:
 

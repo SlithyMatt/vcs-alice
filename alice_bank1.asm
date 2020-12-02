@@ -70,6 +70,7 @@ start_bank1:
    sta HIDE_CAKE_12
    sta HIDE_CAKE_34
    sta HIDE_UMBRELLA
+   sta WINNING
    lda #8
    sta LINE
    lda #32
@@ -567,8 +568,12 @@ level2:
    sta WSYNC
    bit CXP0FB
    bpl @check_p1
+   bit DEAD
+   bmi @death_music_playing
    lda #$80
    sta DEAD
+   INIT_MUSIC level2_death_music
+@death_music_playing:
    sta WSYNC
    jmp @continue_level2
 @check_p1:
@@ -896,7 +901,7 @@ end_level2:
 
 ; 37 scanlines of vertical blank...
 
-   ldx #33
+   ldx #32
 @vblank_loop:
    sta WSYNC
    dex
@@ -927,7 +932,10 @@ end_level2:
    bpl @check_death
    lda LINE
    cmp #129
-   bmi @score
+   bpl @walking
+   sta WSYNC
+   jmp @score
+@walking:
    dec LINE
    lda #$07
    bit FRAME_CTR
@@ -941,6 +949,13 @@ end_level2:
    sta PTR1+1
    lda #48
    sta HEIGHT
+   sta WSYNC
+   bit WINNING
+   bmi @check_frame
+   lda #$80
+   sta WINNING
+   INIT_MUSIC level2_win_music
+@check_frame:
    lda #$08
    bit FRAME_CTR
    beq @score
@@ -958,6 +973,9 @@ end_level2:
    bne @score
    dec LINE
    dec LINE
+   bit DEAD
+   bmi @score
+   INIT_MUSIC level2_death_music
    lda #$80
    sta DEAD
 
@@ -1220,8 +1238,6 @@ level2_umbrella_up:
 .byte $08
 .byte 0
 
-.res 13 ; filler
-
 level2_umbrella_down:
 .repeat 2
 .byte 0,0
@@ -1233,9 +1249,6 @@ level2_umbrella_down:
 .byte $08,0
 .byte $0C,0
 .endrepeat
-
-falling_sprites_1:
-FALLING_SPRITES
 
 ; Music
 
@@ -1255,21 +1268,56 @@ C5 EIGHTH
 D6 EIGHTH
 END_MUSIC level2_falling_music
 
+level2_win_music:
+C5 EIGHTH
+D5 EIGHTH
+E5 EIGHTH
+F5 EIGHTH
+E5 EIGHTH
+F5 EIGHTH
+G5 EIGHTH
+A5 EIGHTH
+G5 EIGHTH
+A5 EIGHTH
+B5 QUARTER
+C6 D_QUARTER
+REST EIGHTH
+C6 EIGHTH
+REST EIGHTH
+G5 SIXTEENTH
+F5 SIXTEENTH
+E5 SIXTEENTH
+D5 SIXTEENTH
+END_MUSIC level2_win_music
+
+level2_death_music:
+.byte 9,1,MUSIC_VOLUME,D_EIGHTH
+.byte 11,1,MUSIC_VOLUME,D_EIGHTH
+.byte 14,1,MUSIC_VOLUME,HALF
+@silence:
+REST WHOLE
+END_MUSIC @silence
+
+falling_sprites_1:
+FALLING_SPRITES
+
+
 ; Sound Effects
 level2_stop_sfx:
 STOP_SFX
 
 level2_umbrella_sfx:
-.byte 14,4,9,5
-.byte 13,4,9,3
-.byte 12,4,9,4
+.byte 8,4,10,10
+.byte 10,4,10,7
+.byte 6,4,11,9
 END_SFX
 
 level2_bonus_sfx:
 .byte 10,4,10,5
+.byte 7,4,10,5
 END_SFX
 
-.res 46 ; filler
+.res 28 ; filler
 
 side_sprites_1:
 SIDE_SPRITES

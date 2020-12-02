@@ -596,7 +596,7 @@ level1_jump_sfx:
 END_SFX
 
 level1_bonus_sfx:
-.byte 10,4,10,5
+.byte 10,4,12,25
 END_SFX
 
 ; Score digits

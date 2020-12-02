@@ -34,7 +34,7 @@ MUSIC_PTR   = $A7 ; music pointer address
 MUSIC_CTR   = $A9
 SFX_PTR     = $AA ; sound effect pointer address
 SFX_CTR     = $AC
-
+WINNING     = $AD
 
 
 .endif
