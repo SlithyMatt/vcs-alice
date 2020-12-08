@@ -25,11 +25,11 @@ STOP_SFX
    lda (SFX_PTR),y
    bpl :+
    sta WSYNC
-   jmp :+++
+   bmi :+++
 :  dec SFX_CTR
    beq :+
    sta WSYNC
-   jmp :++
+   bne :++
 :  sta AUDF1
    iny
    lda (SFX_PTR),y
