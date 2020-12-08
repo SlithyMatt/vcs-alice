@@ -39,7 +39,7 @@ MUSIC_VOLUME = volume
    dec MUSIC_CTR
    beq :+
    sta WSYNC
-   jmp :+++
+   bne :+++
 :  lda (MUSIC_PTR),y
    bmi :+
    sta AUDF0
