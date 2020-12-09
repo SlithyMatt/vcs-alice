@@ -92,7 +92,7 @@ level_b6:
 ; 192 scanlines of picture...
 @score:
    sta WSYNC
-   SCORE digits1_2, digits02_2
+   SCORE digits1_6, digits02_6
 
 ; just blank
    ldx #176

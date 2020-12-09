@@ -23,7 +23,9 @@ jump_b0b1:
 
 start:
    cld
-   ldx #0
+   ldx #$FF
+   txs
+   inx
    lda #0
 Clear:
    sta 0,x
